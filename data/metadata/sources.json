@@ -138,5 +138,23 @@
       "Intersection derivation over-counts pedestrian/footway crossings as junctions; treat as a coarse candidate list, not authoritative."
     ],
     "isSynthetic": false
+  },
+  {
+    "id": "census-tigerweb-ny-boundary",
+    "title": "New York State boundary (generalized)",
+    "provider": "U.S. Census Bureau, TIGERweb",
+    "sourceUrl": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/0",
+    "retrievedAt": "2026-09-22T20:01:39.334861+00:00",
+    "dataDate": "current TIGERweb vintage",
+    "coverage": "Entire State of New York",
+    "resolution": "Generalized to ~200 m for use as a coverage mask, not a legal boundary",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "statewideCoverageMask"
+    ],
+    "limitations": [
+      "Generalized geometry \u2014 not for legal/parcel boundary determinations."
+    ],
+    "isSynthetic": false
   }
 ]
