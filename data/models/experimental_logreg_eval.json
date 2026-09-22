@@ -1,0 +1,65 @@
+{
+  "modelId": "experimental-logreg-v0.1.0",
+  "status": "EXPERIMENTAL \u2014 not used for production predictions",
+  "generatedAt": "2026-09-22T19:38:06.622486+00:00",
+  "trainingRows": 642,
+  "positiveRows": 6,
+  "positiveRate": 0.009345794392523364,
+  "events": [
+    "DFO_3625_From_20100310_to_20100324",
+    "DFO_3629_From_20100327_to_20100331",
+    "DFO_3861_From_20110827_to_20110913"
+  ],
+  "featureColumns": [
+    "elevationM",
+    "slopeDegrees",
+    "landCoverClass",
+    "imperviousPct",
+    "distanceToWaterM",
+    "distanceToRoadM",
+    "relativeElevationZ",
+    "femaSfha"
+  ],
+  "inSampleCoefficients": {
+    "elevationM": -1.8251396606335875,
+    "slopeDegrees": 0.9482740771290845,
+    "landCoverClass": -2.472354215349547,
+    "imperviousPct": -0.9557024507724154,
+    "distanceToWaterM": 0.1366939229155525,
+    "distanceToRoadM": -0.19759338306734067,
+    "relativeElevationZ": -1.823300166982404,
+    "femaSfha": 1.0917325622628293
+  },
+  "leaveOneEventOutFolds": [
+    {
+      "fold": 0,
+      "heldOutEvent": "DFO_3625_From_20100310_to_20100324",
+      "testRows": 214,
+      "testPositives": 3,
+      "brierScore": 0.013959152192579207,
+      "rocAuc": 0.9257503949447077
+    },
+    {
+      "fold": 1,
+      "heldOutEvent": "DFO_3629_From_20100327_to_20100331",
+      "testRows": 214,
+      "testPositives": 2,
+      "brierScore": 0.07133548982235947,
+      "rocAuc": 0.9905660377358491
+    },
+    {
+      "fold": 2,
+      "heldOutEvent": "DFO_3861_From_20110827_to_20110913",
+      "testRows": 214,
+      "testPositives": 1,
+      "brierScore": 0.06836170776435165,
+      "rocAuc": 0.9906103286384976
+    }
+  ],
+  "limitations": [
+    "Only 6 real positive observations total across 3 events \u2014 far too few for a statistically defensible held-out estimate.",
+    "Leave-one-event-out folds are reported for transparency, not as evidence of generalization; each fold's test set is a single event with very few or zero positives, so ROC-AUC/Brier values here are expected to be highly unstable.",
+    "This model is NOT used to generate any user-facing risk score. The deterministic baseline (packages/shared/src/baselineWeights.ts) remains the shipped model."
+  ],
+  "isSynthetic": false
+}
