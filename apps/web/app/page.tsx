@@ -1,68 +1,66 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="flex flex-1 flex-col bg-slate-950 text-slate-100">
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-8 px-6 py-24">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">FloodAI</p>
+          <h1 className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl">
+            An explainable flood-risk map for planning, not panic.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 max-w-2xl text-lg text-slate-300">
+            FloodAI generates an interactive, continuously updating flood-risk heatmap with
+            explainable 0–100 risk scores for a piloted area of Westchester County, NY, then lets
+            you test possible prevention interventions before recommending closer engineering
+            review.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/map"
+            className="rounded-full bg-cyan-500 px-6 py-3 text-center font-medium text-slate-950 transition hover:bg-cyan-400"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Explore the map
+          </Link>
+          <Link
+            href="/methodology"
+            className="rounded-full border border-slate-600 px-6 py-3 text-center font-medium text-slate-100 transition hover:border-slate-400"
           >
-            Documentation
-          </a>
+            How it works
+          </Link>
         </div>
+
+        <ol className="mt-6 grid gap-6 sm:grid-cols-3">
+          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+            <p className="text-sm font-semibold text-cyan-400">1. Predict</p>
+            <p className="mt-1 text-sm text-slate-300">
+              A deterministic, versioned risk engine scores real environmental data on a 250 m
+              grid — no fabricated numbers.
+            </p>
+          </li>
+          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+            <p className="text-sm font-semibold text-cyan-400">2. Inspect</p>
+            <p className="mt-1 text-sm text-slate-300">
+              Click any cell for the exact contributing factors, data sources, and confidence
+              behind its score.
+            </p>
+          </li>
+          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+            <p className="text-sm font-semibold text-cyan-400">3. Plan</p>
+            <p className="mt-1 text-sm text-slate-300">
+              Test a proposed drain, barrier, or repair and see the modeled before/after
+              difference.
+            </p>
+          </li>
+        </ol>
+
+        <p className="mt-6 max-w-2xl rounded-lg border border-amber-700/40 bg-amber-950/30 p-4 text-sm text-amber-200">
+          FloodAI provides planning estimates based on available public data. It does not replace
+          official flood maps, emergency alerts, engineering studies, or instructions from public
+          authorities.
+        </p>
       </main>
     </div>
   );

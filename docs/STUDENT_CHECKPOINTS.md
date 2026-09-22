@@ -17,4 +17,17 @@ Per-phase checkpoints. Each is marked **pending** until the student has personal
 
 ## Phase 1 — Vertical slice
 
+**Status: pending student review**
+
+1. What was built: a real-data pipeline for a pilot AOI (Village of Mamaroneck, NY — real OSM boundary), pulling real USGS 3DEP elevation, NLCD 2021 land cover/impervious surface, OSM roads/facilities/water, and FEMA flood hazard zones; a 250 m analysis grid with real per-cell features; a deterministic, versioned baseline risk engine; and a live `/map` page (MapLibre GL, real basemap, Web Worker inference, hover/click, one rainfall scenario, coverage overlay, colorblind-safe legend).
+2. Most important technical decision: fixing a real bug where MapLibre GL's own internal tile-decoding Web Worker never loaded under Turbopack (the map silently stayed blank — zero tile requests, zero console errors) by vendoring that worker bundle as a static asset and pointing `setWorkerUrl()` at it. This is exactly the kind of bug that looks like "the map is broken" but is actually a bundler/library integration mismatch — worth understanding, not just accepting the fix.
+3. Plain-language explanation: every visible colored cell on the map is computed live, in your browser, by a small formula (the "baseline weights") applied to five real numbers per 250 m square — elevation relative to its neighbors, slope, distance to water, whether FEMA already flags it as a flood zone, and how much impervious (paved/roofed) surface covers it. Nothing is looked up from a pre-baked answer key; change the rainfall dropdown and the whole map recomputes.
+4. Questions the student should be able to answer before continuing:
+   - Why does the baseline engine report `scoreMeaning: "relative_risk_index"` instead of a probability, and what would have to be true for that to change?
+   - Two factors are always listed under "Data limitations" for every cell — which two, and why weren't they computed for this pilot?
+   - Why is inference run in a Web Worker instead of directly in the React component?
+5. Hands-on task: open `/map`, click at least three cells with visibly different colors, and for each one personally check whether the listed top contributing factor makes sense given what you know about that specific location in Mamaroneck (e.g. near the water, near a hill, near downtown pavement).
+
+## Phase 2 — Full real data pipeline
+
 **Status: not started**
