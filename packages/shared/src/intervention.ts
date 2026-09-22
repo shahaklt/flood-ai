@@ -61,7 +61,7 @@ export interface ScenarioDelta {
 /** Spec section 6.10: Jev's typed, confidence-gated assessment. Never blended
  * with or allowed to overwrite the trained/deterministic risk score. */
 export interface JevInterventionAssessment {
-  interventionFit: { choice: string; confidence: number; probabilities: Record<string, number> };
+  interventionFit: { score: number; confidence: number; legend: Record<string, string> };
   residualRisk: { score: number; confidence: number; legend: Record<string, string> };
   evidenceStrength: { score: number; confidence: number; legend: Record<string, string> };
   priorityForEngineeringReview: { score: number; confidence: number; legend: Record<string, string> };

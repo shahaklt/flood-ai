@@ -1,0 +1,11 @@
+{
+  "name": "@flood-ai/jev",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@flood-ai/shared": "*",
+    "@typesafe-ai/sdk": "^0.6.0"
+  }
+}

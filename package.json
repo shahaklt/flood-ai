@@ -4,7 +4,8 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "services/jev"
   ],
   "scripts": {
     "dev:web": "npm run dev --workspace=apps/web",
