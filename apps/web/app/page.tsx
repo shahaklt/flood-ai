@@ -31,6 +31,12 @@ export default function Home() {
           >
             Methodology & data sources
           </Link>
+          <Link
+            href="/impact"
+            className="rounded border border-border px-5 py-2.5 text-center text-sm font-medium text-ink transition-colors hover:border-ink-muted"
+          >
+            Why this matters
+          </Link>
         </div>
 
         <div className="grid gap-px overflow-hidden rounded border border-border bg-border sm:grid-cols-3">

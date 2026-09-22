@@ -1,0 +1,208 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { BASELINE_WEIGHTS_VERSION } from "@flood-ai/shared";
+
+export const metadata: Metadata = {
+  title: "FloodAI — Impact",
+  description: "Why flood risk needs a real, explainable tool: real damage, death, and displacement data, and how FloodAI's model actually performs.",
+};
+
+function Stat({ value, label, source }: { value: string; label: string; source: string }) {
+  return (
+    <div className="border border-border bg-surface p-4">
+      <p className="font-mono text-2xl tabular text-ink sm:text-3xl">{value}</p>
+      <p className="mt-1 text-sm text-ink-muted">{label}</p>
+      <p className="mt-2 text-[10px] text-ink-muted/70">{source}</p>
+    </div>
+  );
+}
+
+export default function ImpactPage() {
+  return (
+    <main className="bg-bg text-ink">
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <p className="font-mono text-xs tracking-wide text-accent">IMPACT</p>
+        <h1 className="mt-2 text-3xl font-medium leading-tight sm:text-4xl">
+          Flooding is the costliest and deadliest weather disaster in the US, every year.
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted">
+          This page states, with sources, why a real explainable risk tool matters, then shows exactly how
+          accurate FloodAI&apos;s own model is right now — including where it falls short — rather than asserting
+          confidence it hasn&apos;t earned.
+        </p>
+
+        {/* National scale */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">National scale</h2>
+          <div className="mt-3 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
+            <Stat value="$115B" label="Total US billion-dollar weather/climate disaster damage, 2025" source="Climate Central (NOAA methodology), 2025" />
+            <Stat value="23" label="Billion-dollar weather/climate disasters in the US, 2025 — third-highest year on record" source="Climate Central, 2025" />
+            <Stat value="276" label="Fatalities from US billion-dollar weather/climate disasters, 2025" source="Climate Central, 2025" />
+            <Stat value="$46B / yr" label="Average annual direct US flood damage, last decade" source="Congressional Budget Office, 2024" />
+            <Stat value="$179.8–496.0B" label="Total annual US economic burden of flooding, including indirect costs" source="US Joint Economic Committee, 2024" />
+            <Stat value="106–127" label="Average US flood deaths per year" source="NOAA / FEMA flood fatality analyses" />
+          </div>
+        </section>
+
+        {/* Most recent hurricane */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">Most recent major hurricane</h2>
+          <div className="mt-3 border border-border bg-surface p-5">
+            <p className="text-lg text-ink">Hurricane Erin — August 2025</p>
+            <p className="mt-1 text-sm text-ink-muted">
+              A Category 5 Atlantic hurricane (160 mph peak winds) that tracked up the US East Coast, flooding
+              North Carolina&apos;s Outer Banks — including a section of the main highway — before generating
+              dangerous surf, rip currents, and coastal flooding from Florida to Maine.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 font-mono text-sm sm:grid-cols-3">
+              <div><span className="text-ink-muted">Category</span><br />5</div>
+              <div><span className="text-ink-muted">Peak winds</span><br />160 mph</div>
+              <div><span className="text-ink-muted">Deaths</span><br />13 (+5 missing)</div>
+              <div><span className="text-ink-muted">Damage</span><br />$25M</div>
+            </div>
+            <p className="mt-3 text-[10px] text-ink-muted/70">National Hurricane Center; NOAA NESDIS; NPR/CNN storm coverage, 2025</p>
+          </div>
+        </section>
+
+        {/* NY / pilot relevance */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">Why this pilot area — Mamaroneck, NY</h2>
+          <div className="mt-3 border border-warn/40 bg-warn-surface p-5">
+            <p className="text-lg text-ink">Hurricane Ida&apos;s remnants — September 1, 2021</p>
+            <p className="mt-1 text-sm text-ink">
+              Record-breaking rainfall (3.5 in/hr in some areas) overwhelmed New York City&apos;s sewer capacity
+              (1.75 in/hr) in a single night, flooding streets, subways, cellars, and basements — much of it{" "}
+              <strong>outside FEMA&apos;s mapped 100-year floodplain</strong>, in exactly the kind of pluvial
+              flooding FloodAI is built to surface.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 font-mono text-sm sm:grid-cols-4">
+              <div><span className="text-ink-muted">NYC deaths</span><br />18</div>
+              <div><span className="text-ink-muted">In flooded basements</span><br />11</div>
+              <div><span className="text-ink-muted">Westchester deaths</span><br />3</div>
+              <div><span className="text-ink-muted">Northeast total</span><br />56</div>
+            </div>
+            <p className="mt-3 text-[10px] text-ink-muted/70">
+              NYC DOHMH Environment &amp; Health Data Portal; NY Federal Reserve / NYS Climate Impacts Assessment case study; contemporary Northeast news reporting, 2021
+            </p>
+          </div>
+          <p className="mt-3 text-sm text-ink-muted">
+            In New York City alone, <span className="font-mono text-ink">168,565</span> properties (
+            <span className="font-mono text-ink">19.7%</span> of all NYC properties) are estimated to be at flood
+            risk over the next 30 years — a 1-in-100-year event today would affect an estimated 83,272 properties,
+            rising to 96,637 in 30 years as risk increases.
+          </p>
+          <p className="mt-1 text-[10px] text-ink-muted/70">First Street Foundation flood risk model, firststreet.org</p>
+        </section>
+
+        {/* Screenshots */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">The tool, running on real data</h2>
+          <div className="mt-3 space-y-6">
+            <figure className="border border-border bg-surface p-2">
+              <Image src="/screenshots/map-heatmap.png" alt="FloodAI live risk heatmap over the Mamaroneck, NY pilot area" width={1600} height={1000} className="w-full" />
+              <figcaption className="p-2 text-xs text-ink-muted">
+                Live risk heatmap — real 100 m analysis grid, real elevation/land-cover/water/FEMA data, computed
+                in the browser.
+              </figcaption>
+            </figure>
+            <figure className="border border-border bg-surface p-2">
+              <Image src="/screenshots/map-cell-detail.png" alt="FloodAI cell detail panel showing contributing factors and confidence" width={1600} height={1000} className="w-full" />
+              <figcaption className="p-2 text-xs text-ink-muted">
+                Click any cell for its exact contributing factors, confidence, and honestly-flagged data gaps —
+                never a black box.
+              </figcaption>
+            </figure>
+            <figure className="border border-border bg-surface p-2">
+              <Image src="/screenshots/simulate-jev.png" alt="FloodAI intervention simulator with real Jev AI assessment" width={1600} height={1000} className="w-full" />
+              <figcaption className="p-2 text-xs text-ink-muted">
+                Intervention simulator: a proposed drain&apos;s modeled before/after effect, plus Jev&apos;s separate,
+                confidence-gated assessment — never blended with the underlying risk score.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        {/* Live interactive embed */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">Try it live</h2>
+          <div className="mt-3 border border-border bg-surface">
+            <iframe src="/map" title="FloodAI live map" className="h-[520px] w-full border-0" loading="lazy" />
+          </div>
+          <p className="mt-2 text-sm text-ink-muted">
+            This is the real, running application — not a screenshot. <Link href="/map" className="text-accent underline">Open it full-screen →</Link>
+          </p>
+        </section>
+
+        {/* Model accuracy */}
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-muted">How accurate is the model, really</h2>
+
+          <div className="mt-3 border border-border bg-surface p-5">
+            <p className="text-sm font-medium text-ink">Shipped model: deterministic baseline ({BASELINE_WEIGHTS_VERSION})</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              This is not a statistical model, so it has no ROC-AUC/accuracy figure — it&apos;s a documented,
+              versioned formula over six real, live-fetched features (elevation, slope, flow accumulation, water
+              proximity, FEMA zone, impervious surface), unit-tested for correctness properties: scores always
+              stay within 0-100, a worse input can never lower a score, and missing real data reduces confidence
+              instead of silently becoming a fabricated zero-risk reading.
+            </p>
+          </div>
+
+          <div className="mt-4 border border-border bg-surface p-5">
+            <p className="text-sm font-medium text-ink">Experimental supervised model — NOT shipped, evaluated honestly</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              A logistic regression trained on 3,591 real event-cell rows (38 real positive flood observations)
+              from 3 real historical events (a March 2010 nor&apos;easter, a late-March 2010 event, and Hurricane
+              Irene 2011), sourced from the Global Flood Database&apos;s real satellite-observed inundation data.
+            </p>
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full border-collapse font-mono text-xs">
+                <thead>
+                  <tr className="border-b border-border text-left text-ink-muted">
+                    <th className="py-1 pr-4 font-normal">Held-out event</th>
+                    <th className="py-1 pr-4 font-normal">Test rows</th>
+                    <th className="py-1 pr-4 font-normal">Positives</th>
+                    <th className="py-1 pr-4 font-normal">ROC-AUC</th>
+                    <th className="py-1 font-normal">Brier</th>
+                  </tr>
+                </thead>
+                <tbody className="text-ink">
+                  <tr className="border-b border-border/50"><td className="py-1 pr-4">Mar 2010 nor&apos;easter</td><td className="py-1 pr-4">1,197</td><td className="py-1 pr-4">22</td><td className="py-1 pr-4">0.880</td><td className="py-1">0.066</td></tr>
+                  <tr className="border-b border-border/50"><td className="py-1 pr-4">Late Mar 2010</td><td className="py-1 pr-4">1,197</td><td className="py-1 pr-4">10</td><td className="py-1 pr-4">0.958</td><td className="py-1">0.106</td></tr>
+                  <tr><td className="py-1 pr-4">Hurricane Irene, 2011</td><td className="py-1 pr-4">1,197</td><td className="py-1 pr-4">6</td><td className="py-1 pr-4">0.948</td><td className="py-1">0.105</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+              Read honestly: these numbers look strong, and the physical signal is real (flooded cells really do
+              skew toward low elevation and water proximity). But with only 6-22 positive examples per held-out
+              fold from just 3 events, each number carries real variance and this is <strong>not a validated
+              model</strong> — which is exactly why it is not what generates the map&apos;s risk scores. Full
+              numbers: <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code>.
+            </p>
+          </div>
+
+          <div className="mt-4 border border-border bg-surface p-5">
+            <p className="text-sm font-medium text-ink">Scaling up: statewide real training data</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              The pipeline now pulls real Global Flood Database events against the entire real New York State
+              boundary (not just this pilot AOI) — 33 real historical events intersect New York, versus 3 for the
+              small pilot area alone, with over 1,200 real positive flood-observation pixels statewide. Building
+              the statewide training table from this real data is an active, ongoing part of this project; see{" "}
+              <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> for the latest numbers
+              once that run completes, and <code className="rounded bg-surface-2 px-1 py-0.5">docs/TRAINING_DATA_AUDIT.md</code>{" "}
+              for the full source-by-source accounting.
+            </p>
+          </div>
+        </section>
+
+        <div className="mt-12 border border-warn/40 bg-warn-surface p-4 text-sm text-ink">
+          <span className="mr-1.5 font-mono text-xs text-warn">[PLANNING TOOL]</span>
+          FloodAI provides planning estimates based on available public data. It does not replace official flood
+          maps, emergency alerts, engineering studies, or instructions from public authorities.
+        </div>
+      </div>
+    </main>
+  );
+}
