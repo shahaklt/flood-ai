@@ -1,0 +1,101 @@
+[
+  {
+    "id": "usgs-3dep-dem-pilot",
+    "title": "USGS 3DEP Bare Earth DEM (pilot AOI clip)",
+    "provider": "U.S. Geological Survey, 3D Elevation Program",
+    "sourceUrl": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer",
+    "retrievedAt": "2026-09-22T14:31:28.781959+00:00",
+    "dataDate": "seamless (see service serviceDescription; compiled as of the service's latest publish date)",
+    "coverage": "Clipped to bbox [-73.75992, 40.91154, -73.70373, 40.97938] (WGS84) around Village of Mamaroneck, NY",
+    "resolution": "~10 m/pixel (requested), F32 elevation in meters",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "relativeElevation",
+      "slope",
+      "flowAccumulationProxy"
+    ],
+    "limitations": [
+      "Bare-earth DEM; does not resolve sub-pixel drainage infrastructure.",
+      "Exported at 10 m via bilinear resampling from the service's native seamless resolution, not raw LiDAR point density."
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "nlcd-2021-land-cover-pilot",
+    "title": "NLCD 2021 Land Cover (pilot AOI clip)",
+    "provider": "Multi-Resolution Land Characteristics (MRLC) Consortium / USGS",
+    "sourceUrl": "https://www.mrlc.gov/data/nlcd-2021-land-cover-conus",
+    "retrievedAt": "2026-09-22T14:32:36.200876+00:00",
+    "dataDate": "2021",
+    "coverage": "Clipped to bbox [-73.75992, 40.91154, -73.70373, 40.97938] (WGS84) around Village of Mamaroneck, NY",
+    "resolution": "30 m/pixel, Anderson Level II land-cover classes",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "landCoverClass",
+      "developedSurfaceContext"
+    ],
+    "limitations": [
+      "30 m resolution is coarser than the 250 m analysis grid but coarser than 10 m DEM; classes generalize mixed-use parcels."
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "nlcd-2021-impervious-pilot",
+    "title": "NLCD 2021 Percent Developed Imperviousness (pilot AOI clip)",
+    "provider": "Multi-Resolution Land Characteristics (MRLC) Consortium / USGS",
+    "sourceUrl": "https://www.mrlc.gov/data/nlcd-2021-percent-developed-imperviousness-conus",
+    "retrievedAt": "2026-09-22T14:32:36.200876+00:00",
+    "dataDate": "2021",
+    "coverage": "Clipped to bbox [-73.75992, 40.91154, -73.70373, 40.97938] (WGS84) around Village of Mamaroneck, NY",
+    "resolution": "30 m/pixel, percent impervious surface (0-100)",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "imperviousSurfaceFactor"
+    ],
+    "limitations": [
+      "2021 snapshot; does not reflect construction after that date."
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "osm-overpass-pilot",
+    "title": "OpenStreetMap roads, public facilities, and surface water (pilot AOI)",
+    "provider": "OpenStreetMap contributors, via Overpass API",
+    "sourceUrl": "https://overpass-api.de/",
+    "retrievedAt": "2026-09-22T14:33:20.017400+00:00",
+    "dataDate": "2026-09-22T14:33:20.017400+00:00",
+    "coverage": "bbox (s,w,n,e) 40.911535,-73.759915,40.979378,-73.703734 around Village of Mamaroneck, NY",
+    "resolution": "Vector, as-mapped geometry",
+    "license": "Open Database License (ODbL) 1.0",
+    "usedFor": [
+      "roadGeometry",
+      "intersectionDensity",
+      "publicFacilities",
+      "surfaceWaterProximity"
+    ],
+    "limitations": [
+      "Crowd-sourced; completeness and tagging accuracy vary by feature and area.",
+      "Element counts at retrieval: {'osm_roads.json': 3407, 'osm_facilities.json': 27, 'osm_water.json': 116}"
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "fema-nfhl-flood-zones-pilot",
+    "title": "FEMA National Flood Hazard Layer \u2014 Flood Hazard Zones (pilot AOI clip)",
+    "provider": "Federal Emergency Management Agency (FEMA)",
+    "sourceUrl": "https://msc.fema.gov/arcgis/rest/services/NFHL_Print/NFHL/MapServer/14",
+    "retrievedAt": "2026-09-22T14:35:32.454504+00:00",
+    "dataDate": "Effective DFIRM panel dates vary by zone; see per-feature DFIRM_ID/SOURCE_CIT",
+    "coverage": "Clipped to bbox [-73.75992, 40.91154, -73.70373, 40.97938] (WGS84) around Village of Mamaroneck, NY (574 zone polygons)",
+    "resolution": "Vector polygons, effective FEMA mapping scale",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "femaFloodZoneIndicator"
+    ],
+    "limitations": [
+      "Context/predictor layer only \u2014 never used as the training label the model reproduces (per project spec).",
+      "Represents mapped riverine/coastal hazard as of the effective panel date; does not capture all local pluvial (rain-driven) flooding."
+    ],
+    "isSynthetic": false
+  }
+]
