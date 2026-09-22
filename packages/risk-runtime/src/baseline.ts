@@ -15,7 +15,7 @@ import {
  * compute from real data (no wired-up hydrologic-soil-group source).
  * Counted against confidence, never faked. */
 const STRUCTURALLY_MISSING_FACTORS = ["soilInfiltration"] as const;
-const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 6; // elevation, slope, flowAccumulation, water, fema, impervious
+const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 7; // elevation, slope, flowAccumulation, TWI, water, fema, impervious
 const TOTAL_CONCEPTUAL_FACTOR_COUNT =
   AVAILABLE_CONCEPTUAL_FACTOR_COUNT + STRUCTURALLY_MISSING_FACTORS.length;
 
@@ -26,30 +26,49 @@ const TOTAL_CONCEPTUAL_FACTOR_COUNT =
  * reads as a strong signal without saturating on larger real channels. */
 const FLOW_ACCUMULATION_LOG_REFERENCE = Math.log1p(50);
 
+/** Real-world TWI at this tile scale typically falls roughly in [2, 10] for
+ * this grid resolution (see services/risk/features.py); linearly normalized
+ * across that documented range rather than an arbitrary scale. */
+const TWI_MIN = 2;
+const TWI_MAX = 10;
+
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
+// `!= null` (loose) deliberately catches both `null` and `undefined`: these
+// values cross a network boundary (worker postMessage, JSON fetch), and a
+// strict `=== null` check lets an `undefined` field (a key silently missing
+// from a payload) slip through as if it were a real number -- either
+// crashing later (calling a method on undefined) or silently propagating
+// NaN through the math. A real bug of this exact shape was caught live via
+// Playwright: `!== null` on topographicWetnessIndex let an undefined value
+// reach `.toFixed()`.
 function elevationFactor(z: number | null): number | null {
-  if (z === null) return null;
+  if (z == null) return null;
   return clamp01(1 - (z + 3) / 6); // lower relative elevation -> higher factor
 }
 
 function slopeFactor(deg: number | null): number | null {
-  if (deg === null) return null;
+  if (deg == null) return null;
   return clamp01(1 - deg / 15); // flatter land -> higher factor (pooling)
 }
 
 function flowAccumulationFactor(count: number | null): number | null {
-  if (count === null) return null;
+  if (count == null) return null;
   return clamp01(Math.log1p(Math.max(0, count)) / FLOW_ACCUMULATION_LOG_REFERENCE);
 }
 
+function twiFactor(twi: number | null): number | null {
+  if (twi == null) return null;
+  return clamp01((twi - TWI_MIN) / (TWI_MAX - TWI_MIN));
+}
+
 function waterProximityFactor(distM: number | null): number | null {
-  if (distM === null) return null;
+  if (distM == null) return null;
   return clamp01(1 - distM / 300);
 }
 
 function imperviousFactor(pct: number | null): number | null {
-  if (pct === null) return null;
+  if (pct == null) return null;
   return clamp01(pct / 100);
 }
 
@@ -101,6 +120,10 @@ export function computeBaselineRisk(features: RiskFeatures, options: BaselineOpt
     lowSlope: slopeFactor(features.slopeDegrees),
     flowAccumulation: (() => {
       const f = flowAccumulationFactor(features.flowAccumulation);
+      return f === null ? null : clamp01(f * (1 + amplification));
+    })(),
+    topographicWetnessIndex: (() => {
+      const f = twiFactor(features.topographicWetnessIndex);
       return f === null ? null : clamp01(f * (1 + amplification));
     })(),
     waterProximity: (() => {
@@ -175,11 +198,15 @@ function factorLabel(key: BaselineFactorKey, features: RiskFeatures): string {
     case "lowSlope":
       return "Flat terrain (low slope)";
     case "flowAccumulation":
-      return features.flowAccumulation !== null
+      return features.flowAccumulation != null
         ? `High modeled flow accumulation (${Math.round(features.flowAccumulation)} contributing cells)`
         : "Modeled flow accumulation";
+    case "topographicWetnessIndex":
+      return features.topographicWetnessIndex != null
+        ? `High topographic wetness index (${features.topographicWetnessIndex.toFixed(1)})`
+        : "Topographic wetness index";
     case "waterProximity":
-      return features.distanceToWaterM !== null
+      return features.distanceToWaterM != null
         ? `Near mapped surface water (${Math.round(features.distanceToWaterM)} m)`
         : "Proximity to mapped surface water";
     case "femaZone":
@@ -187,7 +214,7 @@ function factorLabel(key: BaselineFactorKey, features: RiskFeatures): string {
         ? "Within FEMA Special Flood Hazard Area"
         : "Outside FEMA Special Flood Hazard Area";
     case "impervious":
-      return features.imperviousPct !== null
+      return features.imperviousPct != null
         ? `${features.imperviousPct}% estimated impervious surface`
         : "Impervious surface coverage";
   }
@@ -201,6 +228,8 @@ function rawValueFor(key: BaselineFactorKey, features: RiskFeatures): number | s
       return features.slopeDegrees;
     case "flowAccumulation":
       return features.flowAccumulation;
+    case "topographicWetnessIndex":
+      return features.topographicWetnessIndex;
     case "waterProximity":
       return features.distanceToWaterM;
     case "femaZone":

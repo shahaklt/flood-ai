@@ -5,6 +5,8 @@ the pilot AOI for now (see docs/STUDENT_CHECKPOINTS.md).
 """
 from __future__ import annotations
 
+import time
+
 import requests
 from shapely.geometry import LineString
 from shapely.ops import unary_union
@@ -13,7 +15,7 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "FloodAI-CongressionalAppChallenge/0.1 (student project; contact via github.com/shahaklt/flood-ai)"
 
 
-def fetch_water_union(bbox: tuple[float, float, float, float]):
+def fetch_water_union(bbox: tuple[float, float, float, float], retries: int = 1):
     """Returns a shapely geometry (union of water lines/polygons) or None if
     none found or the request fails (treated as missing data, not zero risk).
 
@@ -31,11 +33,19 @@ def fetch_water_union(bbox: tuple[float, float, float, float]):
         );
         out geom;
     """
-    try:
-        resp = requests.post(OVERPASS_URL, data={"data": query}, headers={"User-Agent": USER_AGENT}, timeout=20)
-        resp.raise_for_status()
-        data = resp.json()
-    except requests.exceptions.RequestException:
+    data = None
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(OVERPASS_URL, data={"data": query}, headers={"User-Agent": USER_AGENT}, timeout=20)
+            resp.raise_for_status()
+            data = resp.json()
+            break
+        except requests.exceptions.RequestException:
+            if attempt < retries:
+                time.sleep(1)
+                continue
+            return None
+    if data is None:
         return None
 
     lines = []

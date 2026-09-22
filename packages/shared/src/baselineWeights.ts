@@ -3,32 +3,37 @@
  * through code, so it can be reviewed, sensitivity-tested, and cited in
  * docs/METHODOLOGY.md.
  *
- * v0.2.0 rationale:
+ * v0.3.0 rationale:
+ * - Added topographicWetnessIndex = ln(flowAccumulation / tan(slope)), the
+ *   standard hydrology combination of the two -- high where water both
+ *   concentrates AND has nowhere to drain, which plain addition of the two
+ *   marginal factors doesn't capture. Computed free from data already
+ *   fetched (services/risk/features.py), so this is a real, zero-cost
+ *   accuracy improvement, not a new external dependency.
+ * - Water proximity is now backed by USGS NHD flowlines in addition to OSM
+ *   (unioned), fixing a real gap where Overpass alone missed water
+ *   statewide at the larger tile scale used for statewide extraction.
+ * - Soil infiltration (hydrologic soil group) remains unwired — no
+ *   authoritative source integrated yet — and its weight stays
+ *   redistributed across the seven factors that are real.
+ *
+ * v0.2.0 rationale (kept for history):
  * - Flow accumulation is now real, computed directly from the fetched DEM
  *   via a standard D8 algorithm (services/risk/hydrology.py), not
  *   fabricated — cells where terrain concentrates upstream flow get a real,
  *   non-trivial weight. This closes one of the two structural gaps from
  *   v0.1.0 and raises the confidence ceiling accordingly (see
  *   risk-runtime/baseline.ts AVAILABLE_CONCEPTUAL_FACTOR_COUNT).
- * - Soil infiltration (hydrologic soil group) remains unwired — no
- *   authoritative source integrated yet — and its weight stays
- *   redistributed across the six factors that are real.
- * - Flow accumulation and water proximity now carry the largest weights:
- *   together with FEMA's own hazard determination, they are the strongest
- *   available real signals for where water actually concentrates, which
- *   matters both for the coastal pilot AOI and for the statewide live tile
- *   service (where flow accumulation is computed per-tile, a real but
- *   edge-truncated signal — see the tile-boundary caveat in
- *   services/risk/hydrology.py).
  */
-export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.2.0";
+export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.3.0";
 
 export const BASELINE_WEIGHTS = {
-  lowElevation: 0.2,
-  lowSlope: 0.1,
-  flowAccumulation: 0.18,
-  waterProximity: 0.2,
-  femaZone: 0.18,
+  lowElevation: 0.18,
+  lowSlope: 0.08,
+  flowAccumulation: 0.14,
+  topographicWetnessIndex: 0.12,
+  waterProximity: 0.18,
+  femaZone: 0.16,
   impervious: 0.14,
 } as const;
 

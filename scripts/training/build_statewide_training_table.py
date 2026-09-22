@@ -22,7 +22,9 @@ import rasterio
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
-from services.risk.adapters import fema, nlcd, osm_water  # noqa: E402
+from shapely.ops import unary_union
+
+from services.risk.adapters import fema, nhd, nlcd, osm_water  # noqa: E402
 from services.risk.adapters.dem import fetch_dem  # noqa: E402
 from services.risk.hydrology import compute_flow_accumulation  # noqa: E402
 from services.risk.tiles import lonlat_to_tile, tile_to_bbox  # noqa: E402
@@ -32,7 +34,19 @@ MANIFEST_PATH = REPO_ROOT / "data" / "metadata" / "gfd_events_nystate.json"
 OUT_PATH = REPO_ROOT / "data" / "demo" / "statewide_training_table.csv"
 TILE_ZOOM = 9
 FEATURE_PIXEL_SIZE_DEG = 0.018  # ~2000m at NY latitudes, matches the GFD label resolution
-MAX_NEGATIVES_PER_EVENT_PER_TILE = 25
+MAX_NEGATIVES_PER_EVENT_PER_TILE = 100  # was 25 -- more real negatives per tile, still bounded
+DEM_RETRY_ATTEMPTS = 3
+
+
+def fetch_dem_with_retry(bbox):
+    last_exc = None
+    for attempt in range(1, DEM_RETRY_ATTEMPTS + 1):
+        try:
+            return fetch_dem(bbox, pixel_size_deg=FEATURE_PIXEL_SIZE_DEG)
+        except Exception as exc:  # real transient 502/504/timeout errors observed from this service
+            last_exc = exc
+            time.sleep(5 * attempt)
+    raise last_exc
 
 
 def find_positive_tiles() -> dict[tuple[int, int, int], list[dict]]:
@@ -78,13 +92,14 @@ def main() -> None:
         print(f"[{i}/{len(tiles)}] tile {z}/{x}/{y} ({len(event_hits)} event(s))...")
 
         try:
-            dem_arr, dem_transform = fetch_dem(bbox, pixel_size_deg=FEATURE_PIXEL_SIZE_DEG)
+            dem_arr, dem_transform = fetch_dem_with_retry(bbox)
         except Exception as exc:
-            print(f"  DEM failed, skipping tile: {exc}")
+            print(f"  DEM failed after {DEM_RETRY_ATTEMPTS} attempts, skipping tile: {exc}")
             continue
         flow_acc_arr = compute_flow_accumulation(dem_arr)
         gy, gx = np.gradient(dem_arr)
         slope_arr = np.degrees(np.arctan(np.sqrt(gx**2 + gy**2)))  # coarse; degree-based, real but approximate at this scale
+        twi_arr = np.log((flow_acc_arr + 1.0) / (np.tan(np.radians(slope_arr)) + 0.01))
 
         try:
             lc_arr, lc_transform = nlcd.fetch_land_cover(bbox)
@@ -99,7 +114,13 @@ def main() -> None:
             print(f"  FEMA unavailable: {exc}")
             fema_sfha = None
 
-        water_union = osm_water.fetch_water_union(bbox)
+        # OSM Overpass reliably times out at this larger z=9 bbox scale; NHD's
+        # generalized flowline layer handles it in a few seconds. Union both
+        # when available for robustness.
+        nhd_union = nhd.fetch_nhd_flowlines_union(bbox)
+        osm_union = osm_water.fetch_water_union(bbox)
+        water_parts = [g for g in (nhd_union, osm_union) if g is not None]
+        water_union = unary_union(water_parts) if water_parts else None
 
         from shapely.geometry import Point
 
@@ -129,6 +150,7 @@ def main() -> None:
                     elev = sample_at(dem_transform, dem_arr, lon, lat)
                     slope = sample_at(dem_transform, slope_arr, lon, lat)
                     flow_acc = sample_at(dem_transform, flow_acc_arr, lon, lat)
+                    twi = sample_at(dem_transform, twi_arr, lon, lat)
                     land_cover = sample_at(lc_transform, lc_arr, lon, lat) if lc_arr is not None else None
                     impervious = sample_at(imp_transform, imp_arr, lon, lat) if imp_arr is not None else None
                     dist_water = Point(lon, lat).distance(water_union) * 111_000 if water_union is not None else None
@@ -142,6 +164,7 @@ def main() -> None:
                         "elevationM": elev,
                         "slopeDegrees": slope,
                         "flowAccumulation": flow_acc,
+                        "topographicWetnessIndex": twi,
                         "relativeElevationZ": rel_z,
                         "landCoverClass": land_cover,
                         "imperviousPct": impervious,
@@ -151,7 +174,7 @@ def main() -> None:
 
         time.sleep(0.5)  # light courtesy delay between tiles (Overpass etiquette)
 
-    df = pd.DataFrame(all_rows).dropna(subset=["elevationM", "slopeDegrees", "flowAccumulation"])
+    df = pd.DataFrame(all_rows).dropna(subset=["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex"])
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT_PATH, index=False)
     print(f"\nWrote {len(df)} real statewide training rows to {OUT_PATH}")

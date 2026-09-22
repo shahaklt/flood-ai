@@ -29,18 +29,18 @@ export function applyInterventionToFeatures(
     case "drain_repair": {
       // A drain conveys water away -- modeled as reducing local flow
       // accumulation within the core influence radius. Never below 0.
-      if (withinCore && next.flowAccumulation !== null) {
+      if (withinCore && next.flowAccumulation != null) {
         next.flowAccumulation = Math.max(0, next.flowAccumulation * (1 - strength * falloff));
         modified.push("flowAccumulation");
       }
       break;
     }
     case "flood_barrier": {
-      if (withinCore && next.distanceToWaterM !== null) {
+      if (withinCore && next.distanceToWaterM != null) {
         // Protected side: effectively pushes the water edge further away.
         next.distanceToWaterM = next.distanceToWaterM + strength * falloff * 200;
         modified.push("distanceToWaterM");
-      } else if (!withinCore && next.flowAccumulation !== null) {
+      } else if (!withinCore && next.flowAccumulation != null) {
         // Documented displacement shadow: water excluded from the protected
         // core has to go somewhere. Cells in the (r, 1.5r] ring get a
         // bounded flow-accumulation INCREASE -- this is what makes
@@ -52,7 +52,7 @@ export function applyInterventionToFeatures(
       break;
     }
     case "road_repair": {
-      if (withinCore && next.slopeDegrees !== null) {
+      if (withinCore && next.slopeDegrees != null) {
         // Regrading/drainage repair reduces the local flat-spot/low-point
         // proxy -- modeled as a bounded slope increase (less pooling).
         next.slopeDegrees = next.slopeDegrees + strength * falloff * 3;
@@ -61,7 +61,7 @@ export function applyInterventionToFeatures(
       break;
     }
     case "permeable_surface": {
-      if (withinCore && next.imperviousPct !== null) {
+      if (withinCore && next.imperviousPct != null) {
         next.imperviousPct = Math.max(0, next.imperviousPct * (1 - strength * falloff));
         modified.push("imperviousPct");
       }

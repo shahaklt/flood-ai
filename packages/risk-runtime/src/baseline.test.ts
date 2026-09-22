@@ -9,6 +9,7 @@ const baseFeatures: RiskFeatures = {
   elevationM: 5,
   slopeDegrees: 2,
   flowAccumulation: 12,
+  topographicWetnessIndex: 5,
   landCoverClass: 22,
   imperviousPct: 40,
   distanceToWaterM: 50,
@@ -69,6 +70,16 @@ describe("computeBaselineRisk", () => {
     expect(missingSlope.confidenceScore).toBeLessThan(full.confidenceScore);
     expect(missingSlope.dataCompleteness.missing).toContain("lowSlope");
     expect(missingSlope.riskScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it("treats an undefined field the same as null, never crashing (real bug: a network payload missing a key is `undefined`, not `null`, and a strict `!== null` check let it slip through to a method call)", () => {
+    // Simulates a RiskFeatures object deserialized from JSON that's missing
+    // a key entirely, rather than explicitly setting it to null.
+    const withMissingKey = { ...baseFeatures } as Partial<RiskFeatures>;
+    delete withMissingKey.topographicWetnessIndex;
+    expect(() => computeBaselineRisk(withMissingKey as RiskFeatures, opts)).not.toThrow();
+    const r = computeBaselineRisk(withMissingKey as RiskFeatures, opts);
+    expect(r.dataCompleteness.missing).toContain("topographicWetnessIndex");
   });
 
   it("always reports the structurally-missing soil infiltration factor", () => {

@@ -9,8 +9,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 from shapely.geometry import Point, box
+from shapely.ops import unary_union
 
-from .adapters import coverage, dem, fema, nlcd, osm_water
+from .adapters import coverage, dem, fema, nhd, nlcd, osm_water
 from .hydrology import compute_flow_accumulation
 from .tiles import tile_to_bbox
 
@@ -58,6 +59,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
         imp_future = pool.submit(nlcd.fetch_impervious, bbox)
         fema_future = pool.submit(fema.fetch_fema_sfha_union, bbox)
         water_future = pool.submit(osm_water.fetch_water_union, bbox)
+        nhd_future = pool.submit(nhd.fetch_nhd_flowlines_union, bbox)
 
         try:
             dem_arr, dem_transform = dem_future.result()
@@ -77,9 +79,12 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
             fema_sfha = None
             warnings.append(f"FEMA NFHL unavailable for this tile: {exc}")
 
-        water_union = water_future.result()
+        osm_water_union = water_future.result()
+        nhd_union = nhd_future.result()
+        water_parts = [g for g in (osm_water_union, nhd_union) if g is not None]
+        water_union = unary_union(water_parts) if water_parts else None
         if water_union is None:
-            warnings.append("No OSM surface water found or Overpass unavailable for this tile")
+            warnings.append("No surface water found from OSM or NHD, or both were unavailable for this tile")
 
     gy, gx = np.gradient(dem_arr)
     # gradient is in pixel units; convert to per-meter using the DEM's own pixel size
@@ -89,6 +94,11 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
     gy_m = gy / (pixel_h_deg * m_per_deg_lat)
     slope_arr = np.degrees(np.arctan(np.sqrt(gx_m**2 + gy_m**2)))
     flow_acc_arr = compute_flow_accumulation(dem_arr)
+    # Topographic Wetness Index: standard hydrology metric combining flow
+    # accumulation and slope (ln(upslope area / tan(slope))) -- high where
+    # water both concentrates AND has nowhere to drain. Free to compute from
+    # data already fetched; epsilon avoids division by zero on flat cells.
+    twi_arr = np.log((flow_acc_arr + 1.0) / (np.tan(np.radians(slope_arr)) + 0.01))
 
     n_cols = max(1, round((xmax - xmin) / (CELL_SIZE_DEG_LAT * m_per_deg_lat / m_per_deg_lon)))
     n_rows = max(1, round((ymax - ymin) / CELL_SIZE_DEG_LAT))
@@ -105,6 +115,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
             elev = _sample(dem_transform, dem_arr, centroid_lon, centroid_lat)
             slope = _sample(dem_transform, slope_arr, centroid_lon, centroid_lat)
             flow_acc = _sample(dem_transform, flow_acc_arr, centroid_lon, centroid_lat)
+            twi = _sample(dem_transform, twi_arr, centroid_lon, centroid_lat)
             land_cover = _sample(lc_transform, lc_arr, centroid_lon, centroid_lat) if lc_arr is not None else None
             impervious = _sample(imp_transform, imp_arr, centroid_lon, centroid_lat) if imp_arr is not None else None
 
@@ -124,6 +135,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
                 "elevationM": elev,
                 "slopeDegrees": slope,
                 "flowAccumulation": flow_acc,
+                "topographicWetnessIndex": twi,
                 "landCoverClass": int(land_cover) if land_cover is not None else None,
                 "imperviousPct": int(impervious) if impervious not in (None,) and impervious <= 100 else None,
                 "distanceToWaterM": round(dist_water_m, 1) if dist_water_m is not None else None,
