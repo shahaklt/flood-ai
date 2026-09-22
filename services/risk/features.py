@@ -5,11 +5,13 @@ generalized to any tile in New York State instead of one fixed pilot AOI.
 from __future__ import annotations
 
 import math
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 from shapely.geometry import Point, box
 
 from .adapters import coverage, dem, fema, nlcd, osm_water
+from .hydrology import compute_flow_accumulation
 from .tiles import tile_to_bbox
 
 CELL_SIZE_DEG_LAT = 0.0009  # ~100 m
@@ -45,10 +47,39 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
 
     warnings: list[str] = []
 
-    try:
-        dem_arr, dem_transform = dem.fetch_dem(bbox)
-    except Exception as exc:  # real upstream failure -> partial/unsupported, never fabricated
-        return {"coverageTier": "partial_data", "features": [], "error": f"DEM fetch failed: {exc}"}
+    # These five real external calls are independent -- run them concurrently
+    # instead of sequentially. This is what takes a cold tile from ~15-25s
+    # down to roughly the slowest single call (~5-10s), since network I/O
+    # dominates, not CPU. Each failure degrades that one source gracefully
+    # (missing feature, lower confidence) rather than failing the whole tile.
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        dem_future = pool.submit(dem.fetch_dem, bbox)
+        lc_future = pool.submit(nlcd.fetch_land_cover, bbox)
+        imp_future = pool.submit(nlcd.fetch_impervious, bbox)
+        fema_future = pool.submit(fema.fetch_fema_sfha_union, bbox)
+        water_future = pool.submit(osm_water.fetch_water_union, bbox)
+
+        try:
+            dem_arr, dem_transform = dem_future.result()
+        except Exception as exc:  # real upstream failure -> partial/unsupported, never fabricated
+            return {"coverageTier": "partial_data", "features": [], "error": f"DEM fetch failed: {exc}"}
+
+        try:
+            lc_arr, lc_transform = lc_future.result()
+            imp_arr, imp_transform = imp_future.result()
+        except Exception as exc:
+            lc_arr = lc_transform = imp_arr = imp_transform = None
+            warnings.append(f"NLCD unavailable for this tile: {exc}")
+
+        try:
+            fema_sfha = fema_future.result()
+        except Exception as exc:
+            fema_sfha = None
+            warnings.append(f"FEMA NFHL unavailable for this tile: {exc}")
+
+        water_union = water_future.result()
+        if water_union is None:
+            warnings.append("No OSM surface water found or Overpass unavailable for this tile")
 
     gy, gx = np.gradient(dem_arr)
     # gradient is in pixel units; convert to per-meter using the DEM's own pixel size
@@ -57,23 +88,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
     gx_m = gx / (pixel_w_deg * m_per_deg_lon)
     gy_m = gy / (pixel_h_deg * m_per_deg_lat)
     slope_arr = np.degrees(np.arctan(np.sqrt(gx_m**2 + gy_m**2)))
-
-    try:
-        lc_arr, lc_transform = nlcd.fetch_land_cover(bbox)
-        imp_arr, imp_transform = nlcd.fetch_impervious(bbox)
-    except Exception as exc:
-        lc_arr = lc_transform = imp_arr = imp_transform = None
-        warnings.append(f"NLCD unavailable for this tile: {exc}")
-
-    try:
-        fema_sfha = fema.fetch_fema_sfha_union(bbox)
-    except Exception as exc:
-        fema_sfha = None
-        warnings.append(f"FEMA NFHL unavailable for this tile: {exc}")
-
-    water_union = osm_water.fetch_water_union(bbox)
-    if water_union is None:
-        warnings.append("No OSM surface water found or Overpass unavailable for this tile")
+    flow_acc_arr = compute_flow_accumulation(dem_arr)
 
     n_cols = max(1, round((xmax - xmin) / (CELL_SIZE_DEG_LAT * m_per_deg_lat / m_per_deg_lon)))
     n_rows = max(1, round((ymax - ymin) / CELL_SIZE_DEG_LAT))
@@ -89,6 +104,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
 
             elev = _sample(dem_transform, dem_arr, centroid_lon, centroid_lat)
             slope = _sample(dem_transform, slope_arr, centroid_lon, centroid_lat)
+            flow_acc = _sample(dem_transform, flow_acc_arr, centroid_lon, centroid_lat)
             land_cover = _sample(lc_transform, lc_arr, centroid_lon, centroid_lat) if lc_arr is not None else None
             impervious = _sample(imp_transform, imp_arr, centroid_lon, centroid_lat) if imp_arr is not None else None
 
@@ -107,6 +123,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
                 "geometry": {"type": "Polygon", "coordinates": [[[cx0, cy0], [cx1, cy0], [cx1, cy1], [cx0, cy1], [cx0, cy0]]]},
                 "elevationM": elev,
                 "slopeDegrees": slope,
+                "flowAccumulation": flow_acc,
                 "landCoverClass": int(land_cover) if land_cover is not None else None,
                 "imperviousPct": int(impervious) if impervious not in (None,) and impervious <= 100 else None,
                 "distanceToWaterM": round(dist_water_m, 1) if dist_water_m is not None else None,

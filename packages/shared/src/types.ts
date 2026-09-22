@@ -22,6 +22,7 @@ export interface RiskFeatures {
   coverageTier: CoverageTier;
   elevationM: number | null;
   slopeDegrees: number | null;
+  flowAccumulation: number | null;
   landCoverClass: number | null;
   imperviousPct: number | null;
   distanceToWaterM: number | null;

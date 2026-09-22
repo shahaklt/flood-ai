@@ -11,13 +11,20 @@ import {
   type RiskResult,
 } from "@flood-ai/shared";
 
-/** Conceptual factors from spec section 6.3 that this pilot pipeline does not
- * yet compute from real data (no filled-DEM flow accumulation, no wired-up
- * hydrologic-soil-group source). Counted against confidence, never faked. */
-const STRUCTURALLY_MISSING_FACTORS = ["flowAccumulation", "soilInfiltration"] as const;
-const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 5; // elevation, slope, water, fema, impervious
+/** Conceptual factor from spec section 6.3 that this pipeline does not yet
+ * compute from real data (no wired-up hydrologic-soil-group source).
+ * Counted against confidence, never faked. */
+const STRUCTURALLY_MISSING_FACTORS = ["soilInfiltration"] as const;
+const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 6; // elevation, slope, flowAccumulation, water, fema, impervious
 const TOTAL_CONCEPTUAL_FACTOR_COUNT =
   AVAILABLE_CONCEPTUAL_FACTOR_COUNT + STRUCTURALLY_MISSING_FACTORS.length;
+
+/** Reference scale for log-normalizing flow accumulation (a cell count, so
+ * heavily right-skewed). Tile-scale local drainage concentration, not a
+ * full watershed value — chosen so a cell with ~50 contributing upstream
+ * cells (a real, locally meaningful drainage line at this grid resolution)
+ * reads as a strong signal without saturating on larger real channels. */
+const FLOW_ACCUMULATION_LOG_REFERENCE = Math.log1p(50);
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
@@ -29,6 +36,11 @@ function elevationFactor(z: number | null): number | null {
 function slopeFactor(deg: number | null): number | null {
   if (deg === null) return null;
   return clamp01(1 - deg / 15); // flatter land -> higher factor (pooling)
+}
+
+function flowAccumulationFactor(count: number | null): number | null {
+  if (count === null) return null;
+  return clamp01(Math.log1p(Math.max(0, count)) / FLOW_ACCUMULATION_LOG_REFERENCE);
 }
 
 function waterProximityFactor(distM: number | null): number | null {
@@ -78,7 +90,7 @@ export function computeBaselineRisk(features: RiskFeatures, options: BaselineOpt
       dataVersion: options.dataVersion,
       rainfallScenarioId: options.rainfallScenarioId,
       topContributors: [],
-      dataCompleteness: { present: [], missing: ["all — cell is outside the supported pilot AOI"] },
+      dataCompleteness: { present: [], missing: ["all — cell is outside New York State, FloodAI's declared coverage area"] },
     };
   }
 
@@ -87,6 +99,10 @@ export function computeBaselineRisk(features: RiskFeatures, options: BaselineOpt
   const factorValues: Record<BaselineFactorKey, number | null> = {
     lowElevation: elevationFactor(features.relativeElevationZ),
     lowSlope: slopeFactor(features.slopeDegrees),
+    flowAccumulation: (() => {
+      const f = flowAccumulationFactor(features.flowAccumulation);
+      return f === null ? null : clamp01(f * (1 + amplification));
+    })(),
     waterProximity: (() => {
       const f = waterProximityFactor(features.distanceToWaterM);
       return f === null ? null : clamp01(f * (1 + amplification));
@@ -158,6 +174,10 @@ function factorLabel(key: BaselineFactorKey, features: RiskFeatures): string {
       return "Low relative elevation";
     case "lowSlope":
       return "Flat terrain (low slope)";
+    case "flowAccumulation":
+      return features.flowAccumulation !== null
+        ? `High modeled flow accumulation (${Math.round(features.flowAccumulation)} contributing cells)`
+        : "Modeled flow accumulation";
     case "waterProximity":
       return features.distanceToWaterM !== null
         ? `Near mapped surface water (${Math.round(features.distanceToWaterM)} m)`
@@ -179,6 +199,8 @@ function rawValueFor(key: BaselineFactorKey, features: RiskFeatures): number | s
       return features.relativeElevationZ;
     case "lowSlope":
       return features.slopeDegrees;
+    case "flowAccumulation":
+      return features.flowAccumulation;
     case "waterProximity":
       return features.distanceToWaterM;
     case "femaZone":

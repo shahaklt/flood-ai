@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import cache
@@ -44,12 +44,16 @@ def get_coverage(z: int, x: int, y: int) -> dict:
 
 
 @app.get("/api/features/{z}/{x}/{y}")
-def get_features(z: int, x: int, y: int) -> dict:
+def get_features(z: int, x: int, y: int, response: Response) -> dict:
     if z < 10 or z > 16:
         raise HTTPException(400, "Zoom level must be between 10 and 16 for live per-tile feature computation.")
 
     cached = cache.read_cached(z, x, y)
     if cached is not None:
+        # Real environmental data for a fixed tile/dataVersion doesn't change
+        # on human timescales -- safe to let browsers/CDNs cache it for a
+        # full day instead of re-requesting on every reload.
+        response.headers["Cache-Control"] = "public, max-age=86400, immutable"
         return cached
 
     result = compute_tile_features(z, x, y)
@@ -61,4 +65,10 @@ def get_features(z: int, x: int, y: int) -> dict:
     }
     if result["coverageTier"] == "validated":
         cache.write_cache(z, x, y, payload)
+        response.headers["Cache-Control"] = "public, max-age=86400, immutable"
+    else:
+        # unsupported/partial tiles aren't disk-cached, so don't tell
+        # browsers to cache them long either -- a later retry should be
+        # allowed to succeed once (e.g.) an upstream API recovers.
+        response.headers["Cache-Control"] = "public, max-age=60"
     return payload

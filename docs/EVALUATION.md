@@ -16,9 +16,11 @@ The baseline (`packages/shared/src/baselineWeights.ts`, `packages/risk-runtime/s
 
 | Held-out event | Test rows | Test positives | ROC-AUC | Brier score |
 |---|---|---|---|---|
-| DFO_3625 (Mar 2010 nor'easter) | 1,197 | 22 | 0.894 | 0.034 |
-| DFO_3629 (late Mar 2010) | 1,197 | 10 | 0.973 | 0.091 |
-| DFO_3861 (Hurricane Irene, 2011) | 1,197 | 6 | 0.983 | 0.092 |
+| DFO_3625 (Mar 2010 nor'easter) | 1,197 | 22 | 0.880 | 0.066 |
+| DFO_3629 (late Mar 2010) | 1,197 | 10 | 0.958 | 0.106 |
+| DFO_3861 (Hurricane Irene, 2011) | 1,197 | 6 | 0.948 | 0.105 |
+
+*(Updated after fixing a real bug where the OSM water query excluded `natural=coastline` — ocean-adjacent cells were missing their water-proximity feature entirely. This pilot AOI is coastal, so the fix changed real feature values for many cells; see `docs/STUDENT_CHECKPOINTS.md`.)*
 
 **How to read this table honestly**: these ROC-AUC values look strong, and the underlying physical signal (flooded cells really do skew toward low elevation and water proximity, which the in-sample coefficients confirm) is real — but with 6-22 positive examples per held-out fold (all drawn from just 3 real events, at a small pilot AOI), each number still carries real variance and would likely look different with a different set of events. This is not a validated model. It is reported to show the pipeline and method work end to end on entirely real data, and to give the student a concrete, honest number to reason about rather than an abstract placeholder.
 

@@ -1,7 +1,7 @@
 {
   "modelId": "experimental-logreg-v0.1.0",
   "status": "EXPERIMENTAL \u2014 not used for production predictions",
-  "generatedAt": "2026-09-22T19:47:38.258904+00:00",
+  "generatedAt": "2026-09-22T20:11:10.333877+00:00",
   "trainingRows": 3591,
   "positiveRows": 38,
   "positiveRate": 0.010582010582010581,
@@ -21,14 +21,14 @@
     "femaSfha"
   ],
   "inSampleCoefficients": {
-    "elevationM": -1.930897915193147,
-    "slopeDegrees": 0.8760896782570631,
-    "landCoverClass": -0.2895298007210685,
-    "imperviousPct": -0.6204511972284376,
-    "distanceToWaterM": 0.9059680620428308,
-    "distanceToRoadM": 0.26758247350782877,
-    "relativeElevationZ": -1.931345964577453,
-    "femaSfha": 2.4054038991877946
+    "elevationM": -2.106504635742166,
+    "slopeDegrees": 0.37534043378028203,
+    "landCoverClass": -0.32805829696853017,
+    "imperviousPct": -0.2402026874493437,
+    "distanceToWaterM": -3.8420844764300077,
+    "distanceToRoadM": 0.04701460488386013,
+    "relativeElevationZ": -2.1035945105227496,
+    "femaSfha": 1.0808234047180052
   },
   "leaveOneEventOutFolds": [
     {
@@ -36,24 +36,24 @@
       "heldOutEvent": "DFO_3625_From_20100310_to_20100324",
       "testRows": 1197,
       "testPositives": 22,
-      "brierScore": 0.03353014953845737,
-      "rocAuc": 0.894468085106383
+      "brierScore": 0.0657110853896091,
+      "rocAuc": 0.8798065764023211
     },
     {
       "fold": 1,
       "heldOutEvent": "DFO_3629_From_20100327_to_20100331",
       "testRows": 1197,
       "testPositives": 10,
-      "brierScore": 0.09070215603893214,
-      "rocAuc": 0.9731255265374894
+      "brierScore": 0.10633280784473373,
+      "rocAuc": 0.9580454928390901
     },
     {
       "fold": 2,
       "heldOutEvent": "DFO_3861_From_20110827_to_20110913",
       "testRows": 1197,
       "testPositives": 6,
-      "brierScore": 0.09189798508077444,
-      "rocAuc": 0.9833473271760426
+      "brierScore": 0.10481423771263607,
+      "rocAuc": 0.9480828435488385
     }
   ],
   "limitations": [

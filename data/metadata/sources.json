@@ -58,28 +58,6 @@
     "isSynthetic": false
   },
   {
-    "id": "osm-overpass-pilot",
-    "title": "OpenStreetMap roads, public facilities, and surface water (pilot AOI)",
-    "provider": "OpenStreetMap contributors, via Overpass API",
-    "sourceUrl": "https://overpass-api.de/",
-    "retrievedAt": "2026-09-22T14:33:20.017400+00:00",
-    "dataDate": "2026-09-22T14:33:20.017400+00:00",
-    "coverage": "bbox (s,w,n,e) 40.911535,-73.759915,40.979378,-73.703734 around Village of Mamaroneck, NY",
-    "resolution": "Vector, as-mapped geometry",
-    "license": "Open Database License (ODbL) 1.0",
-    "usedFor": [
-      "roadGeometry",
-      "intersectionDensity",
-      "publicFacilities",
-      "surfaceWaterProximity"
-    ],
-    "limitations": [
-      "Crowd-sourced; completeness and tagging accuracy vary by feature and area.",
-      "Element counts at retrieval: {'osm_roads.json': 3407, 'osm_facilities.json': 27, 'osm_water.json': 116}"
-    ],
-    "isSynthetic": false
-  },
-  {
     "id": "fema-nfhl-flood-zones-pilot",
     "title": "FEMA National Flood Hazard Layer \u2014 Flood Hazard Zones (pilot AOI clip)",
     "provider": "Federal Emergency Management Agency (FEMA)",
@@ -154,6 +132,47 @@
     ],
     "limitations": [
       "Generalized geometry \u2014 not for legal/parcel boundary determinations."
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "osm-overpass-pilot",
+    "title": "OpenStreetMap roads, public facilities, and surface water (pilot AOI)",
+    "provider": "OpenStreetMap contributors, via Overpass API",
+    "sourceUrl": "https://overpass-api.de/",
+    "retrievedAt": "2026-09-22T20:09:27.383472+00:00",
+    "dataDate": "2026-09-22T20:09:27.383472+00:00",
+    "coverage": "bbox (s,w,n,e) 40.911535,-73.759915,40.979378,-73.703734 around Village of Mamaroneck, NY",
+    "resolution": "Vector, as-mapped geometry",
+    "license": "Open Database License (ODbL) 1.0",
+    "usedFor": [
+      "roadGeometry",
+      "intersectionDensity",
+      "publicFacilities",
+      "surfaceWaterProximity"
+    ],
+    "limitations": [
+      "Crowd-sourced; completeness and tagging accuracy vary by feature and area.",
+      "Element counts at retrieval: {'osm_roads.json': 3407, 'osm_facilities.json': 27, 'osm_water.json': 133}"
+    ],
+    "isSynthetic": false
+  },
+  {
+    "id": "global-flood-db-events-nystate",
+    "title": "Global Flood Database v1 \u2014 real satellite-observed flood events (all of NY State)",
+    "provider": "Tellman et al. 2021 / Global Flood Database, via Google Earth Engine public catalog",
+    "sourceUrl": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+    "retrievedAt": "2026-09-22T20:31:03.659858+00:00",
+    "dataDate": "2000-2018 (913 total events in the source dataset)",
+    "coverage": "33 of 33 real events intersecting all of New York State (clipped to the real state boundary)",
+    "resolution": "500 m/pixel (downsampled from ~250 m native for statewide storage size)",
+    "license": "See Global Flood Database terms (research/public use); attribution required",
+    "usedFor": [
+      "floodEventLabel (statewide supervised training)"
+    ],
+    "limitations": [
+      "500 m storage resolution here vs 250 m for the original pilot-only pull \u2014 coarser than the analysis grid; sampled via nearest-neighbor into the 100 m grid.",
+      "Same satellite-observation-quality caveats as the pilot pull: cloud/vegetation-obscured cells excluded via clear_perc, permanent water excluded via jrc_perm_water."
     ],
     "isSynthetic": false
   }

@@ -8,6 +8,7 @@ const baseFeatures: RiskFeatures = {
   coverageTier: "validated",
   elevationM: 5,
   slopeDegrees: 2,
+  flowAccumulation: 12,
   landCoverClass: 22,
   imperviousPct: 40,
   distanceToWaterM: 50,
@@ -56,6 +57,12 @@ describe("computeBaselineRisk", () => {
     expect(near.riskScore).toBeGreaterThanOrEqual(far.riskScore);
   });
 
+  it("more upstream flow accumulation cannot decrease risk score", () => {
+    const low = computeBaselineRisk({ ...baseFeatures, flowAccumulation: 1 }, opts);
+    const high = computeBaselineRisk({ ...baseFeatures, flowAccumulation: 200 }, opts);
+    expect(high.riskScore).toBeGreaterThanOrEqual(low.riskScore);
+  });
+
   it("reduces confidence rather than fabricating a score when a factor is missing", () => {
     const full = computeBaselineRisk(baseFeatures, opts);
     const missingSlope = computeBaselineRisk({ ...baseFeatures, slopeDegrees: null }, opts);
@@ -64,11 +71,9 @@ describe("computeBaselineRisk", () => {
     expect(missingSlope.riskScore).toBeGreaterThanOrEqual(0);
   });
 
-  it("always reports the two structurally-missing factors", () => {
+  it("always reports the structurally-missing soil infiltration factor", () => {
     const r = computeBaselineRisk(baseFeatures, opts);
-    expect(r.dataCompleteness.missing).toEqual(
-      expect.arrayContaining(["flowAccumulation", "soilInfiltration"]),
-    );
+    expect(r.dataCompleteness.missing).toEqual(expect.arrayContaining(["soilInfiltration"]));
   });
 
   it("assigns category thresholds consistently with the score", () => {

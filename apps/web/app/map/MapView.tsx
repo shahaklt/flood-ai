@@ -6,6 +6,7 @@ import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapLayerMous
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { RISK_RAMP_LEGEND, UNSUPPORTED_COLOR, riskColor } from "@/lib/colorRamp";
+import { tileKey, tilesForBounds } from "@/lib/tileMath";
 import type { RiskWorkerRequest, RiskWorkerResponse } from "./riskWorker";
 
 // Turbopack does not (yet) resolve maplibre-gl's own internal tile-decoding
@@ -16,7 +17,9 @@ import type { RiskWorkerRequest, RiskWorkerResponse } from "./riskWorker";
 setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
 
 const BASEMAP_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
-const DATA_VERSION = "feature-grid-v2-100m-mamaroneck-pilot";
+const DATA_VERSION = "risk-tiles-v1-nystate";
+const FEATURE_TILE_ZOOM = 13; // ~4-5 km tiles at NY latitudes; matches services/risk's live fetch granularity
+const MAX_AUTO_FETCH_TILES = 12; // guard against triggering dozens of slow cold-tile fetches on one pan
 const GRID_SOURCE_ID = "risk-grid";
 const GRID_FILL_LAYER_ID = "risk-grid-fill";
 const GRID_LINE_LAYER_ID = "risk-grid-outline";
@@ -27,11 +30,35 @@ const FACILITIES_LAYER_ID = "facilities-circle";
 const INTERSECTIONS_SOURCE_ID = "intersections";
 const INTERSECTIONS_LAYER_ID = "intersections-circle";
 
-type FeatureGridGeoJSON = GeoJSON.FeatureCollection<GeoJSON.Geometry, RiskFeatures>;
+type CellFeature = GeoJSON.Feature<GeoJSON.Polygon, RiskFeatures>;
 type RoadRawProps = { segmentId: string; highwayClass: string; isMajor: boolean; name: string | null; lengthM: number; nearCellIds: string[] };
 type FacilityRawProps = { facilityId: string; facilityType: string; name: string; nearCellIds: string[] };
 type RoadsGeoJSON = GeoJSON.FeatureCollection<GeoJSON.LineString, RoadRawProps>;
 type FacilitiesGeoJSON = GeoJSON.FeatureCollection<GeoJSON.Point, FacilityRawProps>;
+
+interface RawTileCell {
+  cellId: string;
+  centroid: [number, number];
+  geometry: GeoJSON.Polygon;
+  elevationM: number | null;
+  slopeDegrees: number | null;
+  flowAccumulation: number | null;
+  landCoverClass: number | null;
+  imperviousPct: number | null;
+  distanceToWaterM: number | null;
+  femaSfha: boolean;
+  relativeElevationZ: number | null;
+  coverageTier: RiskFeatures["coverageTier"];
+}
+
+interface TileResponse {
+  tileId: string;
+  dataVersion: string;
+  coverageTier: RiskFeatures["coverageTier"];
+  features: RawTileCell[];
+  warnings?: string[];
+  error?: string;
+}
 
 type SelectedExposure =
   | { kind: "road"; name: string; exposure: RoadSegmentExposure }
@@ -44,12 +71,15 @@ export default function MapView() {
   const requestIdRef = useRef(0);
   const resultsRef = useRef<Map<string, RiskResult>>(new Map());
 
-  const [rawGrid, setRawGrid] = useState<FeatureGridGeoJSON | null>(null);
+  const loadedTileKeysRef = useRef<Set<string>>(new Set());
+
+  const [cellsById, setCellsById] = useState<Map<string, CellFeature>>(new Map());
   const [rawRoads, setRawRoads] = useState<RoadsGeoJSON | null>(null);
   const [rawFacilities, setRawFacilities] = useState<FacilitiesGeoJSON | null>(null);
   const [rainfallScenarioId, setRainfallScenarioId] = useState(RAINFALL_SCENARIOS[0].id);
   const [results, setResults] = useState<Map<string, RiskResult>>(new Map());
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
+  const [loadingTileCount, setLoadingTileCount] = useState(0);
   const [selectedCell, setSelectedCell] = useState<RiskResult | null>(null);
   const [selectedExposure, setSelectedExposure] = useState<SelectedExposure | null>(null);
   const [hoveredScore, setHoveredScore] = useState<number | null>(null);
@@ -57,10 +87,60 @@ export default function MapView() {
   const [showFacilities, setShowFacilities] = useState(true);
   const [showIntersections, setShowIntersections] = useState(false);
 
-  const selectedFeature: RiskFeatures | null =
-    selectedCell && rawGrid
-      ? (rawGrid.features.find((f) => f.properties.cellId === selectedCell.cellId)?.properties ?? null)
-      : null;
+  const selectedFeature: RiskFeatures | null = selectedCell
+    ? (cellsById.get(selectedCell.cellId)?.properties ?? null)
+    : null;
+
+  // Fetch any not-yet-loaded real tiles covering the current map viewport.
+  const fetchVisibleTiles = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    const b = map.getBounds();
+    const bounds: [number, number, number, number] = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+    const tiles = tilesForBounds(bounds, FEATURE_TILE_ZOOM).filter((t) => !loadedTileKeysRef.current.has(tileKey(t)));
+    const toFetch = tiles.slice(0, MAX_AUTO_FETCH_TILES);
+    for (const t of toFetch) loadedTileKeysRef.current.add(tileKey(t));
+
+    if (toFetch.length === 0) return;
+    setLoadingTileCount((n) => n + toFetch.length);
+
+    for (const t of toFetch) {
+      fetch(`/api/risk-tiles/${t.z}/${t.x}/${t.y}`)
+        .then((r) => r.json())
+        .then((tile: TileResponse) => {
+          if (tile.coverageTier === "validated" && tile.features?.length) {
+            setCellsById((prev) => {
+              const next = new Map(prev);
+              for (const c of tile.features) {
+                next.set(c.cellId, {
+                  type: "Feature",
+                  geometry: c.geometry,
+                  properties: {
+                    cellId: c.cellId,
+                    centroid: c.centroid,
+                    coverageTier: c.coverageTier,
+                    elevationM: c.elevationM,
+                    slopeDegrees: c.slopeDegrees,
+                    flowAccumulation: c.flowAccumulation,
+                    landCoverClass: c.landCoverClass,
+                    imperviousPct: c.imperviousPct,
+                    distanceToWaterM: c.distanceToWaterM,
+                    distanceToRoadM: null,
+                    femaSfha: c.femaSfha,
+                    relativeElevationZ: c.relativeElevationZ,
+                  },
+                });
+              }
+              return next;
+            });
+          }
+        })
+        .catch(() => {
+          loadedTileKeysRef.current.delete(tileKey(t)); // allow retry on next viewport change
+        })
+        .finally(() => setLoadingTileCount((n) => Math.max(0, n - 1)));
+    }
+  };
 
   // Set up the inference Web Worker once.
   useEffect(() => {
@@ -80,12 +160,9 @@ export default function MapView() {
     };
   }, []);
 
-  // Fetch the real feature grid + road/facility exposure joins once.
+  // Fetch pilot road/facility exposure joins once (statewide road/facility
+  // exposure is a documented follow-up; see docs/STUDENT_CHECKPOINTS.md).
   useEffect(() => {
-    fetch("/api/features")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("features unavailable"))))
-      .then((fc: FeatureGridGeoJSON) => setRawGrid(fc))
-      .catch(() => setLoadState("error"));
     fetch("/api/exposure-layers?layer=roads")
       .then((r) => (r.ok ? r.json() : null))
       .then((fc: RoadsGeoJSON | null) => fc && setRawRoads(fc));
@@ -94,21 +171,21 @@ export default function MapView() {
       .then((fc: FacilitiesGeoJSON | null) => fc && setRawFacilities(fc));
   }, []);
 
-  // Recompute risk whenever the grid, worker readiness, or rainfall scenario changes.
+  // Recompute risk whenever the loaded cells, worker readiness, or rainfall scenario change.
   useEffect(() => {
     const worker = workerRef.current;
-    if (!rawGrid || !worker) return;
+    if (cellsById.size === 0 || !worker) return;
     const scenario = RAINFALL_SCENARIOS.find((s) => s.id === rainfallScenarioId) ?? RAINFALL_SCENARIOS[0];
     requestIdRef.current += 1;
     const req: RiskWorkerRequest = {
       requestId: requestIdRef.current,
-      features: rawGrid.features.map((f) => f.properties),
+      features: Array.from(cellsById.values()).map((f) => f.properties),
       rainfallTotalInches: scenario.totalInches,
       rainfallScenarioId: scenario.id,
       dataVersion: DATA_VERSION,
     };
     worker.postMessage(req);
-  }, [rawGrid, rainfallScenarioId]);
+  }, [cellsById, rainfallScenarioId]);
 
   // Initialize the map once.
   useEffect(() => {
@@ -121,8 +198,10 @@ export default function MapView() {
     });
     mapRef.current = map;
     map.on("error", (e) => console.error("MapLibre error event:", e.error));
+    map.on("moveend", fetchVisibleTiles);
 
     map.on("load", () => {
+      fetchVisibleTiles();
       map.addSource(GRID_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({
         id: GRID_FILL_LAYER_ID,
@@ -230,13 +309,13 @@ export default function MapView() {
   // Push computed cell results into the risk-grid source.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !rawGrid || results.size === 0) return;
+    if (!map || cellsById.size === 0 || results.size === 0) return;
     const apply = () => {
       const source = map.getSource(GRID_SOURCE_ID) as GeoJSONSource | undefined;
       if (!source) return;
       source.setData({
         type: "FeatureCollection",
-        features: rawGrid.features.map((f) => {
+        features: Array.from(cellsById.values()).map((f) => {
           const r = results.get(f.properties.cellId);
           const fillColor = r && r.coverageTier !== "unsupported" ? riskColor(r.riskScore) : UNSUPPORTED_COLOR;
           return {
@@ -249,7 +328,7 @@ export default function MapView() {
     };
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
-  }, [results, rawGrid]);
+  }, [results, cellsById]);
 
   // Push computed road exposure into the roads source.
   useEffect(() => {
@@ -401,15 +480,19 @@ export default function MapView() {
 
         <div className="px-3 py-2 font-mono text-xs">
           {hoveredScore !== null ? (
-            <p className="tabular text-ink">
+            <p className="tabular">
               <span className="text-ink-muted">hover&nbsp;</span>
-              {String(hoveredScore).padStart(3, "0")}<span className="text-ink-muted">/100</span>
+              <span style={{ color: riskColor(hoveredScore) }}>{String(hoveredScore).padStart(3, "0")}</span>
+              <span className="text-ink-muted">/100</span>
             </p>
           ) : (
             <p className="text-ink-muted">hover a cell for a score</p>
           )}
+          {loadingTileCount > 0 && (
+            <p className="mt-1 text-accent">loading {loadingTileCount} tile{loadingTileCount > 1 ? "s" : ""}…</p>
+          )}
           {loadState === "error" && (
-            <p className="mt-1 text-danger">feature grid unavailable — run the data pipeline first</p>
+            <p className="mt-1 text-danger">risk service unavailable — is uvicorn running?</p>
           )}
         </div>
       </div>
@@ -444,7 +527,10 @@ export default function MapView() {
           </div>
 
           <div className="border-b border-border px-3 py-3">
-            <p className="font-mono text-3xl tabular text-ink">
+            <p
+              className="font-mono text-3xl tabular"
+              style={{ color: selectedCell.coverageTier === "unsupported" ? "var(--ink-muted)" : riskColor(selectedCell.riskScore) }}
+            >
               {String(selectedCell.riskScore).padStart(3, "0")}
               <span className="text-base text-ink-muted">/100</span>
             </p>
@@ -502,7 +588,15 @@ export default function MapView() {
 
           <div className="border-b border-border px-3 py-3">
             <p className="text-sm text-ink">{selectedExposure.name}</p>
-            <p className="mt-2 font-mono text-3xl tabular text-ink">
+            <p
+              className="mt-2 font-mono text-3xl tabular"
+              style={{
+                color:
+                  selectedExposure.exposure.sampledCellCount === 0
+                    ? "var(--ink-muted)"
+                    : riskColor(selectedExposure.exposure.estimatedAccessDisruptionScore),
+              }}
+            >
               {String(selectedExposure.exposure.estimatedAccessDisruptionScore).padStart(3, "0")}
               <span className="text-base text-ink-muted">/100</span>
             </p>

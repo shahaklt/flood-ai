@@ -42,6 +42,7 @@ QUERIES = {
           way["waterway"]({{bbox}});
           way["natural"="water"]({{bbox}});
           relation["natural"="water"]({{bbox}});
+          way["natural"="coastline"]({{bbox}});
         );
         out geom;
     """,

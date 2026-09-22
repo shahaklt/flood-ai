@@ -15,13 +15,19 @@ USER_AGENT = "FloodAI-CongressionalAppChallenge/0.1 (student project; contact vi
 
 def fetch_water_union(bbox: tuple[float, float, float, float]):
     """Returns a shapely geometry (union of water lines/polygons) or None if
-    none found or the request fails (treated as missing data, not zero risk)."""
+    none found or the request fails (treated as missing data, not zero risk).
+
+    Includes `natural=coastline` explicitly — the ocean/tidal edge is tagged
+    as a coastline way in OSM, not `natural=water`, so omitting it silently
+    dropped every ocean-adjacent tile's water-proximity signal (a real bug
+    caught by inspecting ocean-adjacent tiles that showed no elevated risk)."""
     south, west, north, east = bbox[1], bbox[0], bbox[3], bbox[2]
     query = f"""
         [out:json][timeout:15];
         (
           way["waterway"]({south},{west},{north},{east});
           way["natural"="water"]({south},{west},{north},{east});
+          way["natural"="coastline"]({south},{west},{north},{east});
         );
         out geom;
     """
