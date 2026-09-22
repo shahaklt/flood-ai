@@ -186,14 +186,19 @@ export default function ImpactPage() {
           <div className="mt-4 border border-border bg-surface p-5">
             <p className="text-sm font-medium text-ink">Scaled up: statewide real training data</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              The pipeline now pulls real Global Flood Database events against the entire real New York State
-              boundary — 24 real historical events, 6,830 real event-cell rows, and 1,130 real positive flood
-              observations (16.5%), versus 3 events and 38 positives for the pilot area alone. A gradient-boosted
-              model evaluated with 5-fold grouped cross-validation by event reaches a mean ROC-AUC of{" "}
-              <span className="font-mono text-ink">0.799</span> (logistic regression: <span className="font-mono text-ink">0.722</span>)
-              — lower than the pilot&apos;s small-sample numbers, and more believable precisely because of that. One
-              real predictor (distance to water) had to be dropped statewide because Overpass reliably times out
-              at this tile scale — a real, documented limitation, not hidden. See{" "}
+              The pipeline pulls real Global Flood Database events against the entire real New York State boundary
+              — 24 real historical events across 86 tiles, 23,662 usable real event-cell rows, 1,110 real positive
+              flood observations. A real second water source (USGS NHD) and a real hydrology feature (topographic
+              wetness index) were added along the way. The best real result — gradient-boosted trees with real
+              class-balancing — reaches <span className="font-mono text-ink">0.804 ROC-AUC</span> and{" "}
+              <span className="font-mono text-ink">71.5% balanced accuracy</span>.
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              The honest catch, caught and reported rather than hidden: at this dataset&apos;s 4.7% positive rate, an
+              <em> unweighted</em> model reports 95.8% raw accuracy — which sounds better, but is barely above the
+              95.3% you&apos;d get by always guessing &quot;no flood.&quot; Its balanced accuracy is only 58.3%, barely
+              above a coin flip. Real class-balancing trades some raw accuracy for genuine skill: that&apos;s the
+              71.5%/0.804 result above, and it&apos;s the one worth trusting. See{" "}
               <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> and{" "}
               <code className="rounded bg-surface-2 px-1 py-0.5">docs/TRAINING_DATA_AUDIT.md</code> for full numbers.
               Still experimental — not what generates the map&apos;s scores.

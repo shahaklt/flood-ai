@@ -1,12 +1,12 @@
 {
   "modelId": "statewide-experimental-v0.1.0",
   "status": "EXPERIMENTAL \u2014 not used for production predictions",
-  "generatedAt": "2026-09-22T21:09:41.579041+00:00",
-  "trainingRows": 6830,
-  "positiveRows": 1130,
-  "positiveRate": 0.16544655929721816,
+  "generatedAt": "2026-09-22T23:12:48.738848+00:00",
+  "trainingRows": 23662,
+  "positiveRows": 1110,
+  "positiveRate": 0.04691065843969233,
   "events": 24,
-  "tiles": 80,
+  "tiles": 78,
   "featureColumns": [
     "elevationM",
     "slopeDegrees",
@@ -20,140 +20,166 @@
     "name": "distanceToWaterM",
     "reason": "Missing for 96% of statewide rows -- Overpass reliably times out on the larger z=9 tile bboxes used for statewide label extraction."
   },
+  "trivialMajorityClassAccuracy": 0.9530893415603077,
   "logisticRegression": {
     "model": "logistic_regression",
     "folds": [
       {
         "fold": 0,
-        "testRows": 1651,
-        "testPositives": 301,
-        "rocAuc": 0.7481801402731635,
-        "prAuc": 0.46000153062711907,
-        "brierScore": 0.21764263856277696
+        "testRows": 5551,
+        "testPositives": 298,
+        "rocAuc": 0.7776792935197145,
+        "prAuc": 0.23145962940858544,
+        "brierScore": 0.21628605018839306,
+        "rawAccuracy": 0.6589803638983966,
+        "balancedAccuracy": 0.6947864243762274
       },
       {
         "fold": 1,
-        "testRows": 1286,
-        "testPositives": 286,
-        "rocAuc": 0.7138846153846155,
-        "prAuc": 0.4306084686357041,
-        "brierScore": 0.18516143511194633
+        "testRows": 4490,
+        "testPositives": 290,
+        "rocAuc": 0.7183825944170772,
+        "prAuc": 0.17991187658777882,
+        "brierScore": 0.17246028058305693,
+        "rawAccuracy": 0.7674832962138085,
+        "balancedAccuracy": 0.6526067323481117
       },
       {
         "fold": 2,
-        "testRows": 1309,
-        "testPositives": 234,
-        "rocAuc": 0.755501888292586,
-        "prAuc": 0.5158173990794224,
-        "brierScore": 0.1942355443883972
+        "testRows": 4584,
+        "testPositives": 237,
+        "rocAuc": 0.7995537928577738,
+        "prAuc": 0.27524597099919557,
+        "brierScore": 0.20795261111413277,
+        "rawAccuracy": 0.662085514834206,
+        "balancedAccuracy": 0.7121235946222186
       },
       {
         "fold": 3,
-        "testRows": 1294,
-        "testPositives": 194,
-        "rocAuc": 0.7690253045923149,
-        "prAuc": 0.49096882551805376,
-        "brierScore": 0.20410069632619085
+        "testRows": 4511,
+        "testPositives": 111,
+        "rocAuc": 0.6223198198198199,
+        "prAuc": 0.04650989971980693,
+        "brierScore": 0.17910013152209184,
+        "rawAccuracy": 0.7359787186876524,
+        "balancedAccuracy": 0.5748617936117936
       },
       {
         "fold": 4,
-        "testRows": 1290,
-        "testPositives": 115,
-        "rocAuc": 0.6254505087881592,
-        "prAuc": 0.13888179708245907,
-        "brierScore": 0.1859838191867058
+        "testRows": 4526,
+        "testPositives": 174,
+        "rocAuc": 0.7024561306203516,
+        "prAuc": 0.18199265090595199,
+        "brierScore": 0.1813936877530525,
+        "rawAccuracy": 0.7282368537339814,
+        "balancedAccuracy": 0.6324744337390129
       }
     ],
-    "meanRocAuc": 0.7224084914661677,
-    "stdRocAuc": 0.0517802760329118,
-    "meanBrier": 0.19742482671520342
+    "meanRocAuc": 0.7240783262469475,
+    "stdRocAuc": 0.062328747922239795,
+    "meanBrier": 0.19143855223214543,
+    "meanRawAccuracy": 0.7105529494736089,
+    "meanBalancedAccuracy": 0.6533705957394729
   },
   "gradientBoostedTrees": {
     "model": "gradient_boosted_trees",
     "folds": [
       {
         "fold": 0,
-        "testRows": 1651,
-        "testPositives": 301,
-        "rocAuc": 0.8537836840162422,
-        "prAuc": 0.7099680620809418,
-        "brierScore": 0.09046604633072923
+        "testRows": 5551,
+        "testPositives": 298,
+        "rocAuc": 0.865735718930825,
+        "prAuc": 0.4705733936414102,
+        "brierScore": 0.15029248445868576,
+        "rawAccuracy": 0.8009367681498829,
+        "balancedAccuracy": 0.7777045267836724
       },
       {
         "fold": 1,
-        "testRows": 1286,
-        "testPositives": 286,
-        "rocAuc": 0.7881818181818181,
-        "prAuc": 0.5912856777390134,
-        "brierScore": 0.1538272550245311
+        "testRows": 4490,
+        "testPositives": 290,
+        "rocAuc": 0.7840266830870279,
+        "prAuc": 0.2616853130377857,
+        "brierScore": 0.1200199517784077,
+        "rawAccuracy": 0.866815144766147,
+        "balancedAccuracy": 0.6719950738916256
       },
       {
         "fold": 2,
-        "testRows": 1309,
-        "testPositives": 234,
-        "rocAuc": 0.8074696879348042,
-        "prAuc": 0.6255754197340004,
-        "brierScore": 0.10121540038039818
+        "testRows": 4584,
+        "testPositives": 237,
+        "rocAuc": 0.8405607824980417,
+        "prAuc": 0.4284872722391871,
+        "brierScore": 0.15182339924096497,
+        "rawAccuracy": 0.7798865619546248,
+        "balancedAccuracy": 0.7702460302900589
       },
       {
         "fold": 3,
-        "testRows": 1294,
-        "testPositives": 194,
-        "rocAuc": 0.8477624179943767,
-        "prAuc": 0.6328439958546113,
-        "brierScore": 0.08654702671171739
+        "testRows": 4511,
+        "testPositives": 111,
+        "rocAuc": 0.7232903357903357,
+        "prAuc": 0.10587687401866938,
+        "brierScore": 0.13212179011718422,
+        "rawAccuracy": 0.8301928618931501,
+        "balancedAccuracy": 0.6538933251433252
       },
       {
         "fold": 4,
-        "testRows": 1290,
-        "testPositives": 115,
-        "rocAuc": 0.7000407030527289,
-        "prAuc": 0.29322629169161685,
-        "brierScore": 0.07686919675224141
+        "testRows": 4526,
+        "testPositives": 174,
+        "rocAuc": 0.8077802780594997,
+        "prAuc": 0.35267638423821546,
+        "brierScore": 0.12388890150660807,
+        "rawAccuracy": 0.862129916040654,
+        "balancedAccuracy": 0.7020975955037188
       }
     ],
-    "meanRocAuc": 0.7994476622359941,
-    "stdRocAuc": 0.055425146927228774,
-    "meanBrier": 0.10178498503992346
+    "meanRocAuc": 0.8042787596731461,
+    "stdRocAuc": 0.049142395264268474,
+    "meanBrier": 0.13562930542037016,
+    "meanRawAccuracy": 0.8279922505608918,
+    "meanBalancedAccuracy": 0.7151873103224802
   },
   "finalModelCoefficients": {
-    "elevationM": -0.3534992887881265,
-    "slopeDegrees": -0.47674093235441134,
-    "flowAccumulation": 0.1924958418365083,
-    "relativeElevationZ": -0.5172335145417437,
-    "landCoverClass": -0.23971596219475774,
-    "imperviousPct": -0.36687974236615445,
-    "femaSfha": 0.06451500748100375
+    "elevationM": -0.39022138784073573,
+    "slopeDegrees": -0.30674970620771036,
+    "flowAccumulation": 0.17632024744449462,
+    "relativeElevationZ": -0.5839383075552892,
+    "landCoverClass": -0.27956277930145035,
+    "imperviousPct": -0.3630418570164219,
+    "femaSfha": 0.07018140182588876
   },
   "calibrationCurve": {
     "meanPredicted": [
-      0.15412786361601846,
-      0.2383736234573548,
-      0.2900258249821801,
-      0.3415981635848739,
-      0.39009976542836167,
-      0.44297140895702497,
-      0.5002319540355786,
-      0.5631800861175718,
-      0.6475038116361047,
-      0.8159421090907704
+      0.12859822958665507,
+      0.21219823420110717,
+      0.2664646332005692,
+      0.3175531200650642,
+      0.36674263909829125,
+      0.4196941732019466,
+      0.47849590453891944,
+      0.542949424787313,
+      0.6217241233552336,
+      0.7665212390473951
     ],
     "fractionPositive": [
-      0.036603221083455345,
-      0.05710102489019034,
-      0.07759882869692533,
-      0.11859443631039532,
-      0.08931185944363104,
-      0.1376281112737921,
-      0.15666178623718888,
-      0.17715959004392387,
-      0.2562225475841874,
-      0.5475841874084919
+      0.008868243243243243,
+      0.01649048625792812,
+      0.016476552598225603,
+      0.02703844528939586,
+      0.02241962774957699,
+      0.03296703296703297,
+      0.04057480980557904,
+      0.05198647506339814,
+      0.05959425190194421,
+      0.1926489226869455
     ]
   },
   "limitations": [
     "5-fold grouped cross-validation by event (24 events total) -- a real improvement over the pilot's 3-event leave-one-out, but still not a locked, single-touch test set per spec section 6.6.",
     "distanceToWaterM excluded due to real data availability limits at this tile scale, removing a physically important predictor from the statewide model.",
+    "Raw accuracy is misleading at this positive rate: gradient-boosted trees' high raw accuracy is barely above the trivial 'always predict no-flood' baseline (see trivialMajorityClassAccuracy). Balanced accuracy and ROC-AUC are the honest metrics here.",
     "This model is NOT used to generate any user-facing risk score. The deterministic baseline remains the shipped model."
   ],
   "isSynthetic": false

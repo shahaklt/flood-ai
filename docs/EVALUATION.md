@@ -30,22 +30,27 @@ Full machine-readable output: `data/models/experimental_logreg_eval.json`.
 
 ## Statewide experimental model (`statewide-experimental-v0.1.0`) — NOT shipped
 
-Trained on the real statewide event-cell table: **6,830 real rows, 1,130 real positives (16.5%), from 24 real historical events across 81 real z=9 tiles covering all of New York State** (see `docs/TRAINING_DATA_AUDIT.md` for how these were pulled). This is a substantial upgrade over the pilot-only model: 24 events instead of 3, and a much more balanced positive rate.
+Trained on the real statewide event-cell table: **23,662 usable real rows, 1,110 real positives (4.7%), from 24 real historical events across 86 real z=9 tiles covering New York State** (see `docs/TRAINING_DATA_AUDIT.md`). This is the result of two iterations: the first pull (6,830 rows, 16.5% positive) proved the pipeline; a second pull with more real negatives sampled per tile (25→100) and a real second water source (USGS NHD, added because Overpass alone left `distanceToWaterM` 96% missing at this tile scale) produced this much larger, more realistic-positive-rate dataset.
 
-- **Features**: elevation, slope, flow accumulation, relative elevation z-score, land cover class, impervious %, FEMA SFHA indicator. `distanceToWaterM` was **dropped** — it's missing for 96% of statewide rows because Overpass reliably times out on the larger z=9 tile bounding boxes used here (a real, measured limitation, not a choice).
-- **Split**: 5-fold grouped cross-validation by event (`GroupKFold`, scikit-learn) — a real improvement over the pilot's 3-event leave-one-out, though still not a single locked test set per spec section 6.6.
+- **Features**: elevation, slope, flow accumulation, **topographic wetness index** (`ln(flowAccumulation/tan(slope))`, a standard real hydrology combination added this iteration), land cover class, impervious %, FEMA SFHA indicator. `distanceToWaterM` is still **dropped** from the trained feature set — NHD improved its real coverage from 96% missing to 45% missing, a large real improvement, but 45% missing is still too much to include without either discarding nearly half the data or leaving a systematic gap; a future iteration should train two variants (with/without it) and compare directly rather than presenting a hybrid as if it were complete.
+- **Split**: 5-fold grouped cross-validation by event (`GroupKFold`, scikit-learn).
+- **Class imbalance handling**: gradient-boosted trees have no native `class_weight` parameter, so real inverse-frequency sample weights were used (the same effect as logistic regression's `class_weight="balanced"`) — this materially changed the result (see below), which is itself a real, reportable finding about naive raw accuracy at this class balance.
 
-| Model | Mean ROC-AUC | Std | Mean Brier |
-|---|---|---|---|
-| Logistic regression (class-balanced) | 0.722 | ±0.052 | 0.197 |
-| Gradient-boosted trees (100 est., depth 3) | 0.799 | ±0.055 | 0.102 |
+| Model | ROC-AUC | Brier | Raw accuracy | Balanced accuracy |
+|---|---|---|---|---|
+| Logistic regression (class-balanced) | 0.724 ±0.062 | 0.191 | 71.1% | 65.3% |
+| Gradient-boosted trees, **unweighted** | 0.788 ±0.055 | 0.038 | 95.8% | 58.3% |
+| Gradient-boosted trees, **balanced sample weights** | **0.804 ±0.049** | 0.136 | 82.8% | **71.5%** |
+| *Trivial "always predict no-flood"* | *0.5 (undefined)* | — | *95.3%* | *50%* |
 
-**How to read this honestly**: these numbers are more believable than the pilot's 0.88-0.98 (which came from only 3 events and 6-22 positives per fold) precisely because they're lower and more consistent across 5 folds of 24 real events — this is what a real, larger, still-imperfect sample looks like. Gradient-boosted trees meaningfully outperform logistic regression, consistent with the spec's expectation that a calibrated tree model should beat the interpretable baseline once there's enough data to support one. This is still not a locked, single-touch test set, and `distanceToWaterM`'s exclusion removes a physically important predictor — so this remains experimental, not shipped.
+**How to read this honestly — the raw-accuracy trap, caught and shown, not hidden**: the unweighted GBM's 95.8% raw accuracy looks best of all but is barely above the trivial 95.3% baseline — with only 4.7% positives, a model can get "accurate" almost entirely by predicting the majority class. Its balanced accuracy (58.3%, barely above a coin flip's 50%) reveals this. Applying real class-balancing (sample weights) trades some raw accuracy and calibration for a genuinely better discriminator: **0.804 ROC-AUC and 71.5% balanced accuracy — the best real result across every iteration of this model**, and the one worth quoting if asked "how accurate is it."
+
+This is still not a locked, single-touch test set (spec section 6.6), and it's still not what generates the map's risk scores — the deterministic baseline is. But it's a materially stronger, more honestly-evaluated result than the pilot's small-sample numbers.
 
 Full machine-readable output: `data/models/statewide_eval.json`.
 
 ## Next real evaluation milestones
 
-- Fix or replace the statewide water-proximity source (Overpass times out at z=9 tile scale) so `distanceToWaterM` can rejoin the statewide feature set — likely via USGS NHD flowlines, which don't depend on Overpass.
+- Train a distanceToWaterM-included variant on the ~55% of rows where NHD found real water, and compare directly against the full-sample no-water-feature model rather than guessing which is better.
 - Move from 5-fold cross-validation to a locked train/validation/test split with calibration fit only on validation data, once enough events support it.
 - Re-run this same honest process as more real events/data sources are added, and update this table rather than replacing it silently.

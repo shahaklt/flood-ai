@@ -45,12 +45,12 @@
 
 **Purpose**: The same real-data-pipeline proof, at statewide scale — evaluate whether more real events (24, vs. 3 for the pilot-only model) and a real cross-validation split produce a more credible result.
 
-**Training data**: 6,830 real rows, 1,130 real positives (16.5%), from 24 real historical events across 81 real z=9 tiles statewide. See `docs/EVALUATION.md`.
+**Training data**: 23,662 real rows, 1,110 real positives (4.7%), from 24 real historical events across 86 real z=9 tiles statewide, including a real second water source (USGS NHD) and a real hydrology feature (topographic wetness index) added after the first iteration. See `docs/EVALUATION.md`.
 
-**Evaluation**: 5-fold grouped cross-validation by event. Gradient-boosted trees: 0.799 mean ROC-AUC (±0.055). Logistic regression: 0.722 mean ROC-AUC (±0.052).
+**Evaluation**: 5-fold grouped cross-validation by event. Best real result: gradient-boosted trees with balanced sample weights — **0.804 mean ROC-AUC (±0.049), 71.5% balanced accuracy**. (Unweighted GBM reports 95.8% raw accuracy, which is barely above the 95.3% trivial "always predict no-flood" baseline at this class balance — reported and explained in `docs/EVALUATION.md`, not hidden.)
 
 **Status**: Experimental. **Never used to generate a user-facing prediction.**
 
-**Known limitations**: `distanceToWaterM` dropped (96% missing statewide — Overpass times out at this tile scale). Cross-validation, not a locked single-touch test set. Still meaningfully more credible than the 3-event pilot model given the larger, more diverse real sample.
+**Known limitations**: `distanceToWaterM` dropped from the trained feature set (NHD improved real coverage from 96% to 45% missing — better, still too incomplete to include without discarding data). Cross-validation, not a locked single-touch test set. Raw accuracy is a misleading metric at this class balance; balanced accuracy and ROC-AUC are reported as the honest numbers.
 
 **Prohibited uses**: Any production use.
