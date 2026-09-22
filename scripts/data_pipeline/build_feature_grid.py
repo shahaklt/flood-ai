@@ -1,4 +1,4 @@
-"""Build the 250 m analysis grid and derive real per-cell features for the
+"""Build the 100 m analysis grid and derive real per-cell features for the
 pilot AOI, from the raw data pulled by scripts/data_pipeline/sources/*.py.
 
 Output: data/demo/feature_grid.geojson — one Feature per analysis cell, with
@@ -26,9 +26,9 @@ AOI_PATH = REPO_ROOT / "data" / "metadata" / "pilot_aoi.geojson"
 OUT_PATH = REPO_ROOT / "data" / "demo" / "feature_grid.geojson"
 METADATA_PATH = REPO_ROOT / "data" / "metadata" / "sources.json"
 
-CELL_SIZE_M = 250.0
+CELL_SIZE_M = 100.0
 PROJECTED_CRS = "EPSG:32618"  # UTM zone 18N, appropriate for southern NY
-GRID_MODEL_ID = "feature-grid-v1"
+GRID_MODEL_ID = "feature-grid-v2-100m"
 
 # NLCD Anderson Level II codes -> whether "developed" (used for context only;
 # imperviousness itself is a direct coverage, not derived from this map).
@@ -157,7 +157,7 @@ def main() -> None:
     ).to_crs(PROJECTED_CRS)
     fema_sfha_union = unary_union(fema_gdf[fema_gdf["sfha"]].geometry.values) if fema_gdf["sfha"].any() else None
 
-    print("Building 250 m grid...")
+    print("Building 100 m grid...")
     grid = build_grid_polygons_projected(xmin, ymin, xmax, ymax)
     grid_wgs84 = grid.to_crs("EPSG:4326")
 

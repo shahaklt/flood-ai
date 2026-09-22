@@ -2,65 +2,67 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col bg-slate-950 text-slate-100">
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-8 px-6 py-24">
+    <div className="flex flex-1 flex-col bg-bg text-ink">
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center gap-10 px-6 py-24">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-400">FloodAI</p>
-          <h1 className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl">
-            An explainable flood-risk map for planning, not panic.
+          <p className="font-mono text-xs tracking-wide text-accent">FLOODAI — MAMARONECK, NY PILOT</p>
+          <h1 className="mt-3 text-3xl font-medium leading-tight text-ink sm:text-4xl">
+            An explainable flood-risk instrument, not a forecast.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-slate-300">
-            FloodAI generates an interactive, continuously updating flood-risk heatmap with
-            explainable 0–100 risk scores for a piloted area of Westchester County, NY, then lets
-            you test possible prevention interventions before recommending closer engineering
-            review.
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted">
+            FloodAI computes a 0-100 flood-risk index for every 100 m cell in a real pilot area,
+            entirely from real public environmental data — elevation, land cover, FEMA flood
+            zones, road and facility geometry. Every score traces back to the exact factors that
+            produced it. Then you can test a proposed drain, barrier, or repair and see the
+            modeled difference.
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/map"
-            className="rounded-full bg-cyan-500 px-6 py-3 text-center font-medium text-slate-950 transition hover:bg-cyan-400"
+            className="rounded bg-accent px-5 py-2.5 text-center text-sm font-medium text-accent-ink transition-colors hover:brightness-110"
           >
-            Explore the map
+            Open the map
           </Link>
           <Link
             href="/methodology"
-            className="rounded-full border border-slate-600 px-6 py-3 text-center font-medium text-slate-100 transition hover:border-slate-400"
+            className="rounded border border-border px-5 py-2.5 text-center text-sm font-medium text-ink transition-colors hover:border-ink-muted"
           >
-            How it works
+            Methodology & data sources
           </Link>
         </div>
 
-        <ol className="mt-6 grid gap-6 sm:grid-cols-3">
-          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-            <p className="text-sm font-semibold text-cyan-400">1. Predict</p>
-            <p className="mt-1 text-sm text-slate-300">
-              A deterministic, versioned risk engine scores real environmental data on a 250 m
-              grid — no fabricated numbers.
+        <div className="grid gap-px overflow-hidden rounded border border-border bg-border sm:grid-cols-3">
+          <div className="bg-surface p-5">
+            <p className="font-mono text-xs text-accent">01 PREDICT</p>
+            <p className="mt-2 text-sm text-ink-muted">
+              A versioned, deterministic risk engine scores real environmental features on a
+              100 m grid. No fabricated numbers, no synthetic fallback data.
             </p>
-          </li>
-          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-            <p className="text-sm font-semibold text-cyan-400">2. Inspect</p>
-            <p className="mt-1 text-sm text-slate-300">
-              Click any cell for the exact contributing factors, data sources, and confidence
-              behind its score.
+          </div>
+          <div className="bg-surface p-5">
+            <p className="font-mono text-xs text-accent">02 INSPECT</p>
+            <p className="mt-2 text-sm text-ink-muted">
+              Click any cell, road, or facility for its exact contributing factors, data sources,
+              coverage tier, and confidence.
             </p>
-          </li>
-          <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-            <p className="text-sm font-semibold text-cyan-400">3. Plan</p>
-            <p className="mt-1 text-sm text-slate-300">
-              Test a proposed drain, barrier, or repair and see the modeled before/after
-              difference.
+          </div>
+          <div className="bg-surface p-5">
+            <p className="font-mono text-xs text-accent">03 PLAN</p>
+            <p className="mt-2 text-sm text-ink-muted">
+              Model a proposed drain, barrier, or repair and compare before/after risk, including
+              displaced or increased exposure.
             </p>
-          </li>
-        </ol>
+          </div>
+        </div>
 
-        <p className="mt-6 max-w-2xl rounded-lg border border-amber-700/40 bg-amber-950/30 p-4 text-sm text-amber-200">
+        <div className="rounded border border-warn/40 bg-warn-surface p-4 text-sm text-ink">
+          <span className="mr-1.5 font-mono text-xs text-warn">[PLANNING TOOL]</span>
           FloodAI provides planning estimates based on available public data. It does not replace
           official flood maps, emergency alerts, engineering studies, or instructions from public
           authorities.
-        </p>
+        </div>
       </main>
     </div>
   );

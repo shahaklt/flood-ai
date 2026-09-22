@@ -27,13 +27,13 @@
 
 **Inputs**: Same real features as the baseline, plus per-event metadata from the Global Flood Database.
 
-**Training data**: 642 real rows, **6 real positive labels**, from 3 real historical flood events. See `docs/TRAINING_DATA_AUDIT.md` and `docs/EVALUATION.md`.
+**Training data**: 3,591 real rows, **38 real positive labels**, from 3 real historical flood events, at the pilot's current 100 m grid resolution. See `docs/TRAINING_DATA_AUDIT.md` and `docs/EVALUATION.md`.
 
-**Evaluation**: Leave-one-event-out, 3 folds. ROC-AUC 0.93-0.99 per fold — reported honestly as high-variance given 1-3 positives per test fold, not as a validated result.
+**Evaluation**: Leave-one-event-out, 3 folds. ROC-AUC 0.89-0.98 per fold — reported honestly as still high-variance given only 3 source events, not as a validated result.
 
 **Status**: Experimental. **Never used to generate a user-facing prediction.** Kept in the repository and documented per spec section 5.1's contingency: preserve the supervised pipeline as evaluated experimental work rather than deploying an undertrained model or skipping the exercise entirely.
 
-**Known limitations**: Sample size (n=6 positives) is far below what any real deployment would require. Leave-one-event-out at n=3 groups cannot estimate true generalization variance. In-sample coefficients (`data/models/experimental_logreg_eval.json`) should not be over-interpreted as feature importance in a general sense — they describe this specific tiny sample.
+**Known limitations**: Sample size (n=38 positives, from only 3 real events) is far below what any real deployment would require. Leave-one-event-out at n=3 groups cannot estimate true generalization variance. In-sample coefficients (`data/models/experimental_logreg_eval.json`) should not be over-interpreted as feature importance in a general sense — they describe this specific tiny sample.
 
 **Prohibited uses**: Any production use. This model exists for engineering/pedagogical demonstration only.
 

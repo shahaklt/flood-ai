@@ -1,10 +1,10 @@
 {
   "modelId": "experimental-logreg-v0.1.0",
   "status": "EXPERIMENTAL \u2014 not used for production predictions",
-  "generatedAt": "2026-09-22T19:38:06.622486+00:00",
-  "trainingRows": 642,
-  "positiveRows": 6,
-  "positiveRate": 0.009345794392523364,
+  "generatedAt": "2026-09-22T19:47:38.258904+00:00",
+  "trainingRows": 3591,
+  "positiveRows": 38,
+  "positiveRate": 0.010582010582010581,
   "events": [
     "DFO_3625_From_20100310_to_20100324",
     "DFO_3629_From_20100327_to_20100331",
@@ -21,43 +21,43 @@
     "femaSfha"
   ],
   "inSampleCoefficients": {
-    "elevationM": -1.8251396606335875,
-    "slopeDegrees": 0.9482740771290845,
-    "landCoverClass": -2.472354215349547,
-    "imperviousPct": -0.9557024507724154,
-    "distanceToWaterM": 0.1366939229155525,
-    "distanceToRoadM": -0.19759338306734067,
-    "relativeElevationZ": -1.823300166982404,
-    "femaSfha": 1.0917325622628293
+    "elevationM": -1.930897915193147,
+    "slopeDegrees": 0.8760896782570631,
+    "landCoverClass": -0.2895298007210685,
+    "imperviousPct": -0.6204511972284376,
+    "distanceToWaterM": 0.9059680620428308,
+    "distanceToRoadM": 0.26758247350782877,
+    "relativeElevationZ": -1.931345964577453,
+    "femaSfha": 2.4054038991877946
   },
   "leaveOneEventOutFolds": [
     {
       "fold": 0,
       "heldOutEvent": "DFO_3625_From_20100310_to_20100324",
-      "testRows": 214,
-      "testPositives": 3,
-      "brierScore": 0.013959152192579207,
-      "rocAuc": 0.9257503949447077
+      "testRows": 1197,
+      "testPositives": 22,
+      "brierScore": 0.03353014953845737,
+      "rocAuc": 0.894468085106383
     },
     {
       "fold": 1,
       "heldOutEvent": "DFO_3629_From_20100327_to_20100331",
-      "testRows": 214,
-      "testPositives": 2,
-      "brierScore": 0.07133548982235947,
-      "rocAuc": 0.9905660377358491
+      "testRows": 1197,
+      "testPositives": 10,
+      "brierScore": 0.09070215603893214,
+      "rocAuc": 0.9731255265374894
     },
     {
       "fold": 2,
       "heldOutEvent": "DFO_3861_From_20110827_to_20110913",
-      "testRows": 214,
-      "testPositives": 1,
-      "brierScore": 0.06836170776435165,
-      "rocAuc": 0.9906103286384976
+      "testRows": 1197,
+      "testPositives": 6,
+      "brierScore": 0.09189798508077444,
+      "rocAuc": 0.9833473271760426
     }
   ],
   "limitations": [
-    "Only 6 real positive observations total across 3 events \u2014 far too few for a statistically defensible held-out estimate.",
+    "Only 38 real positive observations total across 3 events \u2014 far too few for a statistically defensible held-out estimate.",
     "Leave-one-event-out folds are reported for transparency, not as evidence of generalization; each fold's test set is a single event with very few or zero positives, so ROC-AUC/Brier values here are expected to be highly unstable.",
     "This model is NOT used to generate any user-facing risk score. The deterministic baseline (packages/shared/src/baselineWeights.ts) remains the shipped model."
   ],

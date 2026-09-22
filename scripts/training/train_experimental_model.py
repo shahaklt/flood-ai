@@ -93,8 +93,8 @@ def main() -> None:
         "inSampleCoefficients": coefficients,
         "leaveOneEventOutFolds": fold_results,
         "limitations": [
-            "Only 6 real positive observations total across 3 events — far too few for a "
-            "statistically defensible held-out estimate.",
+            f"Only {n_pos} real positive observations total across {df['eventId'].nunique()} events — "
+            "far too few for a statistically defensible held-out estimate.",
             "Leave-one-event-out folds are reported for transparency, not as evidence of "
             "generalization; each fold's test set is a single event with very few or zero "
             "positives, so ROC-AUC/Brier values here are expected to be highly unstable.",

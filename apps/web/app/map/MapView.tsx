@@ -16,7 +16,7 @@ import type { RiskWorkerRequest, RiskWorkerResponse } from "./riskWorker";
 setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
 
 const BASEMAP_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
-const DATA_VERSION = "feature-grid-v1-mamaroneck-pilot";
+const DATA_VERSION = "feature-grid-v2-100m-mamaroneck-pilot";
 const GRID_SOURCE_ID = "risk-grid";
 const GRID_FILL_LAYER_ID = "risk-grid-fill";
 const GRID_LINE_LAYER_ID = "risk-grid-outline";
@@ -359,131 +359,173 @@ export default function MapView() {
   }, [showFacilities]);
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full bg-bg">
       <div ref={mapContainerRef} className="h-full w-full" aria-label="FloodAI pilot risk map" />
 
-      <div className="absolute left-3 top-3 z-10 flex flex-col gap-2 rounded-lg bg-white/95 p-3 shadow-md dark:bg-slate-900/95">
-        <label htmlFor="rainfall-select" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Rainfall planning scenario
-        </label>
-        <select
-          id="rainfall-select"
-          className="rounded border border-slate-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-slate-100"
-          value={rainfallScenarioId}
-          onChange={(e) => setRainfallScenarioId(e.target.value)}
-        >
-          {RAINFALL_SCENARIOS.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-
-        <div className="mt-1 flex flex-col gap-1 border-t border-slate-200 pt-2 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-300">
-          <p className="font-semibold uppercase tracking-wide text-slate-500">Layers</p>
-          <label className="flex items-center gap-1.5">
-            <input type="checkbox" checked={showRoads} onChange={(e) => setShowRoads(e.target.checked)} />
-            Roads (access-disruption)
+      <div className="absolute left-3 top-3 z-10 w-64 rounded border border-border bg-surface/95 text-ink">
+        <div className="border-b border-border px-3 py-2">
+          <label htmlFor="rainfall-select" className="block font-mono text-[10px] uppercase tracking-wide text-ink-muted">
+            Rainfall scenario
           </label>
-          <label className="flex items-center gap-1.5">
-            <input type="checkbox" checked={showFacilities} onChange={(e) => setShowFacilities(e.target.checked)} />
-            Public facilities
-          </label>
-          <label className="flex items-center gap-1.5">
-            <input type="checkbox" checked={showIntersections} onChange={(e) => setShowIntersections(e.target.checked)} />
-            Intersections (candidate)
-          </label>
+          <select
+            id="rainfall-select"
+            className="mt-1 w-full rounded border border-border bg-surface-2 px-2 py-1 text-sm text-ink focus:border-accent focus:outline-none"
+            value={rainfallScenarioId}
+            onChange={(e) => setRainfallScenarioId(e.target.value)}
+          >
+            {RAINFALL_SCENARIOS.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {hoveredScore !== null && (
-          <p className="text-sm text-slate-700 dark:text-slate-200">
-            Provisional score: <strong>{hoveredScore}</strong> / 100
-          </p>
-        )}
-        {loadState === "error" && (
-          <p className="max-w-56 text-xs text-red-600">Feature grid unavailable. Run the data pipeline scripts first.</p>
-        )}
+        <div className="border-b border-border px-3 py-2">
+          <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Layers</p>
+          <div className="mt-1.5 flex flex-col gap-1 text-xs text-ink">
+            <label className="flex items-center gap-1.5">
+              <input type="checkbox" checked={showRoads} onChange={(e) => setShowRoads(e.target.checked)} />
+              Roads — access disruption
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="checkbox" checked={showFacilities} onChange={(e) => setShowFacilities(e.target.checked)} />
+              Public facilities
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="checkbox" checked={showIntersections} onChange={(e) => setShowIntersections(e.target.checked)} />
+              Intersections (candidate)
+            </label>
+          </div>
+        </div>
+
+        <div className="px-3 py-2 font-mono text-xs">
+          {hoveredScore !== null ? (
+            <p className="tabular text-ink">
+              <span className="text-ink-muted">hover&nbsp;</span>
+              {String(hoveredScore).padStart(3, "0")}<span className="text-ink-muted">/100</span>
+            </p>
+          ) : (
+            <p className="text-ink-muted">hover a cell for a score</p>
+          )}
+          {loadState === "error" && (
+            <p className="mt-1 text-danger">feature grid unavailable — run the data pipeline first</p>
+          )}
+        </div>
       </div>
 
-      <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-white/95 p-3 text-xs shadow-md dark:bg-slate-900/95">
-        <p className="mb-1 font-semibold text-slate-600 dark:text-slate-300">Estimated susceptibility (0-100)</p>
-        <div className="flex h-3 w-48 overflow-hidden rounded">
+      <div className="absolute bottom-3 left-3 z-10 rounded border border-border bg-surface/95 p-3">
+        <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Susceptibility index</p>
+        <div className="mt-2 flex h-2.5 w-56 overflow-hidden rounded-sm">
           {RISK_RAMP_LEGEND.map(([, color]) => (
             <div key={color} className="flex-1" style={{ backgroundColor: color }} />
           ))}
         </div>
-        <div className="mt-1 flex justify-between text-[10px] text-slate-500">
-          <span>0 minimal</span>
-          <span>100 very high</span>
+        <div className="mt-1 flex justify-between font-mono text-[10px] tabular text-ink-muted">
+          <span>000</span>
+          <span>025</span>
+          <span>050</span>
+          <span>075</span>
+          <span>100</span>
         </div>
-        <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-500">
-          <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: UNSUPPORTED_COLOR }} />
-          Unsupported / no coverage
+        <div className="mt-2 flex items-center gap-1.5 text-[10px] text-ink-muted">
+          <span className="inline-block h-2 w-2" style={{ backgroundColor: UNSUPPORTED_COLOR }} />
+          unsupported / no coverage
         </div>
       </div>
 
       {selectedCell && selectedFeature && (
-        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded-lg bg-white/98 p-4 text-sm shadow-lg dark:bg-slate-900/98">
-          <button className="float-right text-slate-400 hover:text-slate-700" onClick={() => setSelectedCell(null)} aria-label="Close cell details">
-            ×
-          </button>
-          <h3 className="font-semibold text-slate-800 dark:text-slate-100">
-            Estimated flood risk: {selectedCell.riskScore} / 100 — {selectedCell.riskCategory.replace("_", " ")}
-          </h3>
-          <p className="mt-1 text-xs text-slate-500">
-            Score meaning: relative risk index (deterministic baseline, not a calibrated probability)
-          </p>
-          <p className="text-xs text-slate-500">
-            Coverage tier: {selectedCell.coverageTier} · Confidence: {selectedCell.confidenceScore}/100
-          </p>
-          <p className="mt-2 font-medium text-slate-700 dark:text-slate-200">Largest contributing factors:</p>
-          <ol className="mt-1 list-decimal space-y-1 pl-5">
-            {selectedCell.topContributors.map((c) => (
-              <li key={c.factor}>
-                {c.label}: +{c.contribution}
-              </li>
-            ))}
-          </ol>
+        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded border border-border bg-surface text-sm text-ink shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Cell detail</span>
+            <button className="text-ink-muted hover:text-ink" onClick={() => setSelectedCell(null)} aria-label="Close cell details">
+              ✕
+            </button>
+          </div>
+
+          <div className="border-b border-border px-3 py-3">
+            <p className="font-mono text-3xl tabular text-ink">
+              {String(selectedCell.riskScore).padStart(3, "0")}
+              <span className="text-base text-ink-muted">/100</span>
+            </p>
+            <p className="mt-0.5 text-xs uppercase tracking-wide text-ink-muted">
+              {selectedCell.riskCategory.replace("_", " ")} · relative risk index
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 border-b border-border px-3 py-2 font-mono text-xs">
+            <span className="text-ink-muted">coverage</span>
+            <span className="text-right tabular text-ink">{selectedCell.coverageTier}</span>
+            <span className="text-ink-muted">confidence</span>
+            <span className="text-right tabular text-ink">{selectedCell.confidenceScore}/100</span>
+          </div>
+
+          <div className="border-b border-border px-3 py-2">
+            <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Contributing factors</p>
+            <div className="mt-1.5 grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs">
+              {selectedCell.topContributors.map((c) => (
+                <div key={c.factor} className="contents">
+                  <span className="text-ink">{c.label}</span>
+                  <span className="tabular text-right font-mono text-accent">+{c.contribution}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {selectedCell.dataCompleteness.missing.length > 0 && (
-            <>
-              <p className="mt-2 font-medium text-slate-700 dark:text-slate-200">Data limitations:</p>
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-slate-500">
+            <div className="border-b border-border bg-warn-surface px-3 py-2">
+              <p className="font-mono text-[10px] uppercase tracking-wide text-warn">[data gaps]</p>
+              <ul className="mt-1 space-y-0.5 text-xs text-ink">
                 {selectedCell.dataCompleteness.missing.map((m) => (
-                  <li key={m}>No verified data available for: {m}</li>
+                  <li key={m}>no verified data: {m}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
-          <p className="mt-2 text-[10px] text-slate-400">
-            Model {selectedCell.modelVersion} · Data {selectedCell.dataVersion}
+
+          <p className="px-3 py-2 font-mono text-[10px] text-ink-muted">
+            model {selectedCell.modelVersion} · data {selectedCell.dataVersion}
           </p>
         </aside>
       )}
 
       {selectedExposure && (
-        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded-lg bg-white/98 p-4 text-sm shadow-lg dark:bg-slate-900/98">
-          <button className="float-right text-slate-400 hover:text-slate-700" onClick={() => setSelectedExposure(null)} aria-label="Close exposure details">
-            ×
-          </button>
-          <h3 className="font-semibold text-slate-800 dark:text-slate-100">
-            {selectedExposure.kind === "road" ? "Road segment" : "Public facility"}: {selectedExposure.name}
-          </h3>
-          <p className="mt-1 text-xs text-slate-500">
-            Estimated access-disruption risk: <strong>{selectedExposure.exposure.estimatedAccessDisruptionScore}</strong> / 100
-          </p>
+        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded border border-border bg-surface text-sm text-ink shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">
+              {selectedExposure.kind === "road" ? "Road segment" : "Public facility"}
+            </span>
+            <button className="text-ink-muted hover:text-ink" onClick={() => setSelectedExposure(null)} aria-label="Close exposure details">
+              ✕
+            </button>
+          </div>
+
+          <div className="border-b border-border px-3 py-3">
+            <p className="text-sm text-ink">{selectedExposure.name}</p>
+            <p className="mt-2 font-mono text-3xl tabular text-ink">
+              {String(selectedExposure.exposure.estimatedAccessDisruptionScore).padStart(3, "0")}
+              <span className="text-base text-ink-muted">/100</span>
+            </p>
+            <p className="mt-0.5 text-xs uppercase tracking-wide text-ink-muted">estimated access-disruption risk</p>
+          </div>
+
           {selectedExposure.exposure.sampledCellCount === 0 ? (
-            <p className="mt-2 text-xs text-amber-600">
+            <p className="px-3 py-3 text-xs text-warn">
               No supported analysis cells nearby yet — exposure cannot be estimated for this feature.
             </p>
           ) : (
             <>
-              <ul className="mt-2 space-y-1 text-xs text-slate-600 dark:text-slate-300">
-                <li>Max nearby cell risk: {selectedExposure.exposure.maxRiskScore} / 100</li>
-                <li>90th percentile: {selectedExposure.exposure.p90RiskScore} / 100</li>
-                <li>Mean nearby cell risk: {selectedExposure.exposure.meanRiskScore} / 100</li>
-                <li>Sampled cells: {selectedExposure.exposure.sampledCellCount}</li>
-              </ul>
-              <p className="mt-2 text-[10px] text-slate-400">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 border-b border-border px-3 py-2 font-mono text-xs">
+                <span className="text-ink-muted">max nearby</span>
+                <span className="text-right tabular text-ink">{selectedExposure.exposure.maxRiskScore}/100</span>
+                <span className="text-ink-muted">p90</span>
+                <span className="text-right tabular text-ink">{selectedExposure.exposure.p90RiskScore}/100</span>
+                <span className="text-ink-muted">mean nearby</span>
+                <span className="text-right tabular text-ink">{selectedExposure.exposure.meanRiskScore}/100</span>
+                <span className="text-ink-muted">sampled cells</span>
+                <span className="text-right tabular text-ink">{selectedExposure.exposure.sampledCellCount}</span>
+              </div>
+              <p className="px-3 py-2 text-[11px] text-ink-muted">
                 This is an estimated access-disruption risk, not a claim that the {selectedExposure.kind} will be
                 physically inaccessible.
               </p>
@@ -492,7 +534,7 @@ export default function MapView() {
         </aside>
       )}
 
-      <p className="absolute bottom-3 right-3 z-10 max-w-64 rounded-lg bg-white/90 p-2 text-[10px] text-slate-500 dark:bg-slate-900/90">
+      <p className="absolute bottom-3 right-3 z-10 max-w-64 rounded border border-border bg-surface/90 p-2 text-[10px] text-ink-muted">
         Road and facility colors use the same scale as the cell heatmap; intersections are a coarse OSM-derived
         candidate list, shown ungraded pending a dedicated exposure model.
       </p>

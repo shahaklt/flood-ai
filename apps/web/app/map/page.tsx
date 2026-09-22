@@ -12,7 +12,7 @@ export default function MapPage() {
       <div className="flex-1">
         <MapView />
       </div>
-      <p className="bg-slate-900 px-3 py-1 text-center text-[11px] text-slate-300">
+      <p className="border-t border-border bg-surface px-3 py-1 text-center text-[11px] text-ink-muted">
         FloodAI provides planning estimates based on available public data. It does not replace
         official flood maps, emergency alerts, engineering studies, or instructions from public
         authorities.
