@@ -1,6 +1,7 @@
 "use client";
 
-import { RAINFALL_SCENARIOS, type RiskFeatures, type RiskResult } from "@flood-ai/shared";
+import { RAINFALL_SCENARIOS, type FacilityExposure, type RiskFeatures, type RiskResult, type RoadSegmentExposure } from "@flood-ai/shared";
+import { aggregateExposure, estimatedAccessDisruptionScore } from "@flood-ai/risk-runtime";
 import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
@@ -16,11 +17,25 @@ setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
 
 const BASEMAP_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 const DATA_VERSION = "feature-grid-v1-mamaroneck-pilot";
-const SOURCE_ID = "risk-grid";
-const FILL_LAYER_ID = "risk-grid-fill";
-const LINE_LAYER_ID = "risk-grid-outline";
+const GRID_SOURCE_ID = "risk-grid";
+const GRID_FILL_LAYER_ID = "risk-grid-fill";
+const GRID_LINE_LAYER_ID = "risk-grid-outline";
+const ROADS_SOURCE_ID = "road-segments";
+const ROADS_LAYER_ID = "road-segments-line";
+const FACILITIES_SOURCE_ID = "facilities";
+const FACILITIES_LAYER_ID = "facilities-circle";
+const INTERSECTIONS_SOURCE_ID = "intersections";
+const INTERSECTIONS_LAYER_ID = "intersections-circle";
 
 type FeatureGridGeoJSON = GeoJSON.FeatureCollection<GeoJSON.Geometry, RiskFeatures>;
+type RoadRawProps = { segmentId: string; highwayClass: string; isMajor: boolean; name: string | null; lengthM: number; nearCellIds: string[] };
+type FacilityRawProps = { facilityId: string; facilityType: string; name: string; nearCellIds: string[] };
+type RoadsGeoJSON = GeoJSON.FeatureCollection<GeoJSON.LineString, RoadRawProps>;
+type FacilitiesGeoJSON = GeoJSON.FeatureCollection<GeoJSON.Point, FacilityRawProps>;
+
+type SelectedExposure =
+  | { kind: "road"; name: string; exposure: RoadSegmentExposure }
+  | { kind: "facility"; name: string; exposure: FacilityExposure };
 
 export default function MapView() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -30,11 +45,17 @@ export default function MapView() {
   const resultsRef = useRef<Map<string, RiskResult>>(new Map());
 
   const [rawGrid, setRawGrid] = useState<FeatureGridGeoJSON | null>(null);
+  const [rawRoads, setRawRoads] = useState<RoadsGeoJSON | null>(null);
+  const [rawFacilities, setRawFacilities] = useState<FacilitiesGeoJSON | null>(null);
   const [rainfallScenarioId, setRainfallScenarioId] = useState(RAINFALL_SCENARIOS[0].id);
   const [results, setResults] = useState<Map<string, RiskResult>>(new Map());
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [selectedCell, setSelectedCell] = useState<RiskResult | null>(null);
+  const [selectedExposure, setSelectedExposure] = useState<SelectedExposure | null>(null);
   const [hoveredScore, setHoveredScore] = useState<number | null>(null);
+  const [showRoads, setShowRoads] = useState(true);
+  const [showFacilities, setShowFacilities] = useState(true);
+  const [showIntersections, setShowIntersections] = useState(false);
 
   const selectedFeature: RiskFeatures | null =
     selectedCell && rawGrid
@@ -59,15 +80,18 @@ export default function MapView() {
     };
   }, []);
 
-  // Fetch the real feature grid once.
+  // Fetch the real feature grid + road/facility exposure joins once.
   useEffect(() => {
     fetch("/api/features")
-      .then((r) => {
-        if (!r.ok) throw new Error("features unavailable");
-        return r.json();
-      })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("features unavailable"))))
       .then((fc: FeatureGridGeoJSON) => setRawGrid(fc))
       .catch(() => setLoadState("error"));
+    fetch("/api/exposure-layers?layer=roads")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((fc: RoadsGeoJSON | null) => fc && setRawRoads(fc));
+    fetch("/api/exposure-layers?layer=facilities")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((fc: FacilitiesGeoJSON | null) => fc && setRawFacilities(fc));
   }, []);
 
   // Recompute risk whenever the grid, worker readiness, or rainfall scenario changes.
@@ -99,44 +123,102 @@ export default function MapView() {
     map.on("error", (e) => console.error("MapLibre error event:", e.error));
 
     map.on("load", () => {
-      map.addSource(SOURCE_ID, {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] },
-      });
+      map.addSource(GRID_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({
-        id: FILL_LAYER_ID,
+        id: GRID_FILL_LAYER_ID,
         type: "fill",
-        source: SOURCE_ID,
+        source: GRID_SOURCE_ID,
         paint: {
           "fill-color": ["get", "fillColor"],
           "fill-opacity": ["case", ["==", ["get", "coverageTier"], "unsupported"], 0.12, 0.65],
         },
       });
       map.addLayer({
-        id: LINE_LAYER_ID,
+        id: GRID_LINE_LAYER_ID,
         type: "line",
-        source: SOURCE_ID,
+        source: GRID_SOURCE_ID,
         paint: { "line-color": "#1e293b", "line-width": 0.3, "line-opacity": 0.4 },
       });
 
-      map.on("mousemove", FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
+      map.addSource(ROADS_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({
+        id: ROADS_LAYER_ID,
+        type: "line",
+        source: ROADS_SOURCE_ID,
+        layout: { visibility: "visible" },
+        paint: {
+          "line-color": ["get", "exposureColor"],
+          "line-width": ["case", ["get", "isMajor"], 3, 1.5],
+          "line-opacity": 0.85,
+        },
+      });
+
+      map.addSource(FACILITIES_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({
+        id: FACILITIES_LAYER_ID,
+        type: "circle",
+        source: FACILITIES_SOURCE_ID,
+        layout: { visibility: "visible" },
+        paint: {
+          "circle-radius": 6,
+          "circle-color": ["get", "exposureColor"],
+          "circle-stroke-color": "#1e293b",
+          "circle-stroke-width": 1.5,
+        },
+      });
+
+      map.addSource(INTERSECTIONS_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({
+        id: INTERSECTIONS_LAYER_ID,
+        type: "circle",
+        source: INTERSECTIONS_SOURCE_ID,
+        layout: { visibility: "none" },
+        paint: { "circle-radius": 2.5, "circle-color": "#64748b" },
+      });
+
+      map.on("mousemove", GRID_FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
         const f = e.features?.[0];
         if (f) {
           setHoveredScore((f.properties?.riskScore as number | undefined) ?? null);
           map.getCanvas().style.cursor = "pointer";
         }
       });
-      map.on("mouseleave", FILL_LAYER_ID, () => {
+      map.on("mouseleave", GRID_FILL_LAYER_ID, () => {
         setHoveredScore(null);
         map.getCanvas().style.cursor = "";
       });
-      map.on("click", FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
+      map.on("click", GRID_FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
         const f = e.features?.[0];
         if (!f) return;
         const cellId = f.properties?.cellId as string;
-        const result = resultsRef.current.get(cellId) ?? null;
-        setSelectedCell(result);
+        setSelectedExposure(null);
+        setSelectedCell(resultsRef.current.get(cellId) ?? null);
       });
+
+      map.on("click", ROADS_LAYER_ID, (e: MapLayerMouseEvent) => {
+        const f = e.features?.[0];
+        if (!f?.properties) return;
+        setSelectedCell(null);
+        setSelectedExposure({
+          kind: "road",
+          name: (f.properties.name as string) || (f.properties.highwayClass as string) || "Road segment",
+          exposure: JSON.parse(f.properties.exposureJson as string) as RoadSegmentExposure,
+        });
+      });
+      map.on("click", FACILITIES_LAYER_ID, (e: MapLayerMouseEvent) => {
+        const f = e.features?.[0];
+        if (!f?.properties) return;
+        setSelectedCell(null);
+        setSelectedExposure({
+          kind: "facility",
+          name: f.properties.name as string,
+          exposure: JSON.parse(f.properties.exposureJson as string) as FacilityExposure,
+        });
+      });
+      for (const layerId of [ROADS_LAYER_ID, FACILITIES_LAYER_ID]) {
+        map.on("mouseenter", layerId, () => (map.getCanvas().style.cursor = "pointer"));
+        map.on("mouseleave", layerId, () => (map.getCanvas().style.cursor = ""));
+      }
     });
 
     return () => {
@@ -145,15 +227,14 @@ export default function MapView() {
     };
   }, []);
 
-  // Push computed results into the map source whenever they change.
+  // Push computed cell results into the risk-grid source.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !rawGrid || results.size === 0) return;
-
     const apply = () => {
-      const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
+      const source = map.getSource(GRID_SOURCE_ID) as GeoJSONSource | undefined;
       if (!source) return;
-      const enriched: GeoJSON.FeatureCollection = {
+      source.setData({
         type: "FeatureCollection",
         features: rawGrid.features.map((f) => {
           const r = results.get(f.properties.cellId);
@@ -161,21 +242,121 @@ export default function MapView() {
           return {
             type: "Feature",
             geometry: f.geometry,
-            properties: {
-              cellId: f.properties.cellId,
-              coverageTier: r?.coverageTier ?? "unsupported",
-              riskScore: r?.riskScore ?? null,
-              fillColor,
-            },
+            properties: { cellId: f.properties.cellId, coverageTier: r?.coverageTier ?? "unsupported", riskScore: r?.riskScore ?? null, fillColor },
           };
         }),
-      };
-      source.setData(enriched);
+      });
     };
-
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
   }, [results, rawGrid]);
+
+  // Push computed road exposure into the roads source.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !rawRoads || results.size === 0) return;
+    const apply = () => {
+      const source = map.getSource(ROADS_SOURCE_ID) as GeoJSONSource | undefined;
+      if (!source) return;
+      source.setData({
+        type: "FeatureCollection",
+        features: rawRoads.features.map((f) => {
+          const stats = aggregateExposure(f.properties.nearCellIds, results);
+          const disruption = estimatedAccessDisruptionScore(stats);
+          const exposure: RoadSegmentExposure = {
+            ...stats,
+            segmentId: f.properties.segmentId,
+            highwayClass: f.properties.highwayClass,
+            isMajor: f.properties.isMajor,
+            name: f.properties.name,
+            lengthM: f.properties.lengthM,
+            estimatedAccessDisruptionScore: disruption,
+          };
+          return {
+            type: "Feature",
+            geometry: f.geometry,
+            properties: {
+              name: f.properties.name,
+              highwayClass: f.properties.highwayClass,
+              isMajor: f.properties.isMajor,
+              exposureColor: stats.sampledCellCount > 0 ? riskColor(disruption) : UNSUPPORTED_COLOR,
+              exposureJson: JSON.stringify(exposure),
+            },
+          };
+        }),
+      });
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [results, rawRoads]);
+
+  // Push computed facility exposure into the facilities source.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !rawFacilities || results.size === 0) return;
+    const apply = () => {
+      const source = map.getSource(FACILITIES_SOURCE_ID) as GeoJSONSource | undefined;
+      if (!source) return;
+      source.setData({
+        type: "FeatureCollection",
+        features: rawFacilities.features.map((f) => {
+          const stats = aggregateExposure(f.properties.nearCellIds, results);
+          const disruption = estimatedAccessDisruptionScore(stats);
+          const exposure: FacilityExposure = {
+            ...stats,
+            facilityId: f.properties.facilityId,
+            facilityType: f.properties.facilityType,
+            name: f.properties.name,
+            estimatedAccessDisruptionScore: disruption,
+          };
+          return {
+            type: "Feature",
+            geometry: f.geometry,
+            properties: {
+              name: f.properties.name,
+              facilityType: f.properties.facilityType,
+              exposureColor: stats.sampledCellCount > 0 ? riskColor(disruption) : UNSUPPORTED_COLOR,
+              exposureJson: JSON.stringify(exposure),
+            },
+          };
+        }),
+      });
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [results, rawFacilities]);
+
+  // Fetch + show intersections lazily only once the toggle is switched on.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const setVis = () => map.setLayoutProperty(INTERSECTIONS_LAYER_ID, "visibility", showIntersections ? "visible" : "none");
+    if (map.isStyleLoaded()) setVis();
+    else map.once("load", setVis);
+
+    if (showIntersections && map.getSource(INTERSECTIONS_SOURCE_ID)) {
+      const source = map.getSource(INTERSECTIONS_SOURCE_ID) as GeoJSONSource;
+      fetch("/api/exposure-layers?layer=intersections")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((fc) => fc && source.setData(fc));
+    }
+  }, [showIntersections]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const setVis = () => map.setLayoutProperty(ROADS_LAYER_ID, "visibility", showRoads ? "visible" : "none");
+    if (map.isStyleLoaded()) setVis();
+    else map.once("load", setVis);
+  }, [showRoads]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const setVis = () => map.setLayoutProperty(FACILITIES_LAYER_ID, "visibility", showFacilities ? "visible" : "none");
+    if (map.isStyleLoaded()) setVis();
+    else map.once("load", setVis);
+  }, [showFacilities]);
 
   return (
     <div className="relative h-full w-full">
@@ -197,15 +378,30 @@ export default function MapView() {
             </option>
           ))}
         </select>
+
+        <div className="mt-1 flex flex-col gap-1 border-t border-slate-200 pt-2 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-300">
+          <p className="font-semibold uppercase tracking-wide text-slate-500">Layers</p>
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" checked={showRoads} onChange={(e) => setShowRoads(e.target.checked)} />
+            Roads (access-disruption)
+          </label>
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" checked={showFacilities} onChange={(e) => setShowFacilities(e.target.checked)} />
+            Public facilities
+          </label>
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" checked={showIntersections} onChange={(e) => setShowIntersections(e.target.checked)} />
+            Intersections (candidate)
+          </label>
+        </div>
+
         {hoveredScore !== null && (
           <p className="text-sm text-slate-700 dark:text-slate-200">
             Provisional score: <strong>{hoveredScore}</strong> / 100
           </p>
         )}
         {loadState === "error" && (
-          <p className="max-w-56 text-xs text-red-600">
-            Feature grid unavailable. Run the data pipeline scripts first.
-          </p>
+          <p className="max-w-56 text-xs text-red-600">Feature grid unavailable. Run the data pipeline scripts first.</p>
         )}
       </div>
 
@@ -228,16 +424,11 @@ export default function MapView() {
 
       {selectedCell && selectedFeature && (
         <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded-lg bg-white/98 p-4 text-sm shadow-lg dark:bg-slate-900/98">
-          <button
-            className="float-right text-slate-400 hover:text-slate-700"
-            onClick={() => setSelectedCell(null)}
-            aria-label="Close cell details"
-          >
+          <button className="float-right text-slate-400 hover:text-slate-700" onClick={() => setSelectedCell(null)} aria-label="Close cell details">
             ×
           </button>
           <h3 className="font-semibold text-slate-800 dark:text-slate-100">
-            Estimated flood risk: {selectedCell.riskScore} / 100 —{" "}
-            {selectedCell.riskCategory.replace("_", " ")}
+            Estimated flood risk: {selectedCell.riskScore} / 100 — {selectedCell.riskCategory.replace("_", " ")}
           </h3>
           <p className="mt-1 text-xs text-slate-500">
             Score meaning: relative risk index (deterministic baseline, not a calibrated probability)
@@ -268,6 +459,43 @@ export default function MapView() {
           </p>
         </aside>
       )}
+
+      {selectedExposure && (
+        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded-lg bg-white/98 p-4 text-sm shadow-lg dark:bg-slate-900/98">
+          <button className="float-right text-slate-400 hover:text-slate-700" onClick={() => setSelectedExposure(null)} aria-label="Close exposure details">
+            ×
+          </button>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-100">
+            {selectedExposure.kind === "road" ? "Road segment" : "Public facility"}: {selectedExposure.name}
+          </h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Estimated access-disruption risk: <strong>{selectedExposure.exposure.estimatedAccessDisruptionScore}</strong> / 100
+          </p>
+          {selectedExposure.exposure.sampledCellCount === 0 ? (
+            <p className="mt-2 text-xs text-amber-600">
+              No supported analysis cells nearby yet — exposure cannot be estimated for this feature.
+            </p>
+          ) : (
+            <>
+              <ul className="mt-2 space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <li>Max nearby cell risk: {selectedExposure.exposure.maxRiskScore} / 100</li>
+                <li>90th percentile: {selectedExposure.exposure.p90RiskScore} / 100</li>
+                <li>Mean nearby cell risk: {selectedExposure.exposure.meanRiskScore} / 100</li>
+                <li>Sampled cells: {selectedExposure.exposure.sampledCellCount}</li>
+              </ul>
+              <p className="mt-2 text-[10px] text-slate-400">
+                This is an estimated access-disruption risk, not a claim that the {selectedExposure.kind} will be
+                physically inaccessible.
+              </p>
+            </>
+          )}
+        </aside>
+      )}
+
+      <p className="absolute bottom-3 right-3 z-10 max-w-64 rounded-lg bg-white/90 p-2 text-[10px] text-slate-500 dark:bg-slate-900/90">
+        Road and facility colors use the same scale as the cell heatmap; intersections are a coarse OSM-derived
+        candidate list, shown ungraded pending a dedicated exposure model.
+      </p>
     </div>
   );
 }

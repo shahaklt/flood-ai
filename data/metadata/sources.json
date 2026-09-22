@@ -118,5 +118,25 @@
       "MODIS-derived \u2014 coarser native resolution than the 250 m analysis grid suggests; do not oversell spatial precision."
     ],
     "isSynthetic": false
+  },
+  {
+    "id": "osm-derived-exposure-layers-pilot",
+    "title": "Derived road/facility/intersection exposure joins (from real OSM data)",
+    "provider": "Derived from OpenStreetMap contributors (Overpass) by scripts/data_pipeline/build_exposure_layers.py",
+    "sourceUrl": "https://overpass-api.de/",
+    "retrievedAt": "2026-09-22T19:40:13.585458+00:00",
+    "dataDate": "derived from osm-overpass-pilot retrieval",
+    "coverage": "Pilot AOI (Mamaroneck, NY): 3407 road segments, 27 facilities, 4031 derived intersection candidates",
+    "resolution": "Vector, real OSM geometry; intersections are a heuristic (nodes shared by >=2 ways, including non-vehicle highway classes like footways) not an authoritative traffic-engineering dataset",
+    "license": "Open Database License (ODbL) 1.0 (inherited from OSM)",
+    "usedFor": [
+      "roadSegmentExposure",
+      "facilityExposure",
+      "intersectionExposure"
+    ],
+    "limitations": [
+      "Intersection derivation over-counts pedestrian/footway crossings as junctions; treat as a coarse candidate list, not authoritative."
+    ],
+    "isSynthetic": false
   }
 ]

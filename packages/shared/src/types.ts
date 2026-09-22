@@ -78,6 +78,30 @@ export interface DataSource {
   isSynthetic: boolean;
 }
 
+export interface ExposureStats {
+  maxRiskScore: number;
+  meanRiskScore: number;
+  p90RiskScore: number;
+  sampledCellCount: number;
+  coverageTier: CoverageTier;
+}
+
+export interface RoadSegmentExposure extends ExposureStats {
+  segmentId: string;
+  highwayClass: string;
+  isMajor: boolean;
+  name: string | null;
+  lengthM: number;
+  estimatedAccessDisruptionScore: number;
+}
+
+export interface FacilityExposure extends ExposureStats {
+  facilityId: string;
+  facilityType: string;
+  name: string;
+  estimatedAccessDisruptionScore: number;
+}
+
 export const RAINFALL_SCENARIOS: RainfallScenario[] = [
   { id: "1in-6h", label: "1 in over 6 hr", totalInches: 1, durationHours: 6, isCustom: false },
   { id: "2in-6h", label: "2 in over 6 hr", totalInches: 2, durationHours: 6, isCustom: false },
