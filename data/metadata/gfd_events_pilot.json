@@ -1,0 +1,110 @@
+[
+  {
+    "eventId": "DFO_2273_From_20030705_to_20030721",
+    "dfoMainCause": "Heavy rain",
+    "dfoCountry": "USA",
+    "dfoSeverity": 2,
+    "dfoDead": 3,
+    "dfoDisplaced": 1200,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_2273_From_20030705_to_20030721.tif"
+  },
+  {
+    "eventId": "DFO_2412_From_20040104_to_20040116",
+    "dfoMainCause": "Heavy rain",
+    "dfoCountry": "USA",
+    "dfoSeverity": 1,
+    "dfoDead": 2,
+    "dfoDisplaced": 60,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_2412_From_20040104_to_20040116.tif"
+  },
+  {
+    "eventId": "DFO_2606_From_20050105_to_20050201",
+    "dfoMainCause": "Heavy rain",
+    "dfoCountry": "USA",
+    "dfoSeverity": 2,
+    "dfoDead": 3,
+    "dfoDisplaced": 4000,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_2606_From_20050105_to_20050201.tif"
+  },
+  {
+    "eventId": "DFO_3171_From_20070816_to_20070827",
+    "dfoMainCause": "Heavy rain",
+    "dfoCountry": "USA",
+    "dfoSeverity": 1.5,
+    "dfoDead": 26,
+    "dfoDisplaced": 2800,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3171_From_20070816_to_20070827.tif"
+  },
+  {
+    "eventId": "DFO_3268_From_20080206_to_20080212",
+    "dfoMainCause": "Rain and snowmelt",
+    "dfoCountry": "USA",
+    "dfoSeverity": 1.5,
+    "dfoDead": 0,
+    "dfoDisplaced": 150,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3268_From_20080206_to_20080212.tif"
+  },
+  {
+    "eventId": "DFO_3285_From_20080317_to_20080502",
+    "dfoMainCause": "Rain and snowmelt",
+    "dfoCountry": "USA",
+    "dfoSeverity": 1.5,
+    "dfoDead": 18,
+    "dfoDisplaced": 1000,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3285_From_20080317_to_20080502.tif"
+  },
+  {
+    "eventId": "DFO_3625_From_20100310_to_20100324",
+    "dfoMainCause": "Heavy Rain Snowmelt Dam B",
+    "dfoCountry": "USA",
+    "dfoSeverity": 1,
+    "dfoDead": 0,
+    "dfoDisplaced": 0,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3625_From_20100310_to_20100324.tif"
+  },
+  {
+    "eventId": "DFO_3629_From_20100327_to_20100331",
+    "dfoMainCause": "Heavy Rain",
+    "dfoCountry": "USA",
+    "dfoSeverity": 2,
+    "dfoDead": 0,
+    "dfoDisplaced": 0,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3629_From_20100327_to_20100331.tif"
+  },
+  {
+    "eventId": "DFO_3861_From_20110827_to_20110913",
+    "dfoMainCause": "Tropical Storm Irene",
+    "dfoCountry": "USA",
+    "dfoSeverity": 2,
+    "dfoDead": 20,
+    "dfoDisplaced": 370000,
+    "timeStart": null,
+    "timeEnd": null,
+    "clearPercThreshold": "standard",
+    "rasterPath": "data/raw/gfd_events/DFO_3861_From_20110827_to_20110913.tif"
+  }
+]

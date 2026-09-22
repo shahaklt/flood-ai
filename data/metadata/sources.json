@@ -97,5 +97,26 @@
       "Represents mapped riverine/coastal hazard as of the effective panel date; does not capture all local pluvial (rain-driven) flooding."
     ],
     "isSynthetic": false
+  },
+  {
+    "id": "global-flood-db-events-pilot",
+    "title": "Global Flood Database v1 \u2014 real satellite-observed flood events (pilot AOI region)",
+    "provider": "Tellman et al. 2021 / Global Flood Database, via Google Earth Engine public catalog",
+    "sourceUrl": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+    "retrievedAt": "2026-09-22T15:08:10.596243+00:00",
+    "dataDate": "2000-2018 (913 total events in the source dataset; see per-event timeStart/timeEnd)",
+    "coverage": "9 real events whose mapped footprint intersects the pilot AOI region (bounds [[-73.799915, 40.87153499999998], [-73.663734, 40.87153499999998], [-73.663734, 41.01939803477677], [-73.799915, 41.01939803477677], [-73.799915, 40.87153499999998]])",
+    "resolution": "~250 m/pixel (MODIS-derived), downloaded at 250 m to match the analysis grid",
+    "license": "See Global Flood Database terms (research/public use); attribution required",
+    "usedFor": [
+      "floodEventLabel (supervised training candidate)"
+    ],
+    "limitations": [
+      "Satellite-observed inundation only \u2014 cloud/vegetation obscured cells are excluded via clear_perc, not treated as non-flooded.",
+      "Permanent water (jrc_perm_water) must be excluded from both positive and negative training examples.",
+      "Event footprints for this small pilot AOI may cover only part of it; per-event, per-cell completeness must be checked before training (see docs/TRAINING_DATA_AUDIT.md).",
+      "MODIS-derived \u2014 coarser native resolution than the 250 m analysis grid suggests; do not oversell spatial precision."
+    ],
+    "isSynthetic": false
   }
 ]
