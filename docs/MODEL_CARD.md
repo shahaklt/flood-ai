@@ -38,3 +38,19 @@
 **Prohibited uses**: Any production use. This model exists for engineering/pedagogical demonstration only.
 
 **Path to promotion**: See "What would change this model's status" in `docs/EVALUATION.md`.
+
+---
+
+## Statewide experimental model (`statewide-experimental-v0.1.0`) — NOT shipped
+
+**Purpose**: The same real-data-pipeline proof, at statewide scale — evaluate whether more real events (24, vs. 3 for the pilot-only model) and a real cross-validation split produce a more credible result.
+
+**Training data**: 6,830 real rows, 1,130 real positives (16.5%), from 24 real historical events across 81 real z=9 tiles statewide. See `docs/EVALUATION.md`.
+
+**Evaluation**: 5-fold grouped cross-validation by event. Gradient-boosted trees: 0.799 mean ROC-AUC (±0.055). Logistic regression: 0.722 mean ROC-AUC (±0.052).
+
+**Status**: Experimental. **Never used to generate a user-facing prediction.**
+
+**Known limitations**: `distanceToWaterM` dropped (96% missing statewide — Overpass times out at this tile scale). Cross-validation, not a locked single-touch test set. Still meaningfully more credible than the 3-event pilot model given the larger, more diverse real sample.
+
+**Prohibited uses**: Any production use.

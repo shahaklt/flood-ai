@@ -184,15 +184,19 @@ export default function ImpactPage() {
           </div>
 
           <div className="mt-4 border border-border bg-surface p-5">
-            <p className="text-sm font-medium text-ink">Scaling up: statewide real training data</p>
+            <p className="text-sm font-medium text-ink">Scaled up: statewide real training data</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               The pipeline now pulls real Global Flood Database events against the entire real New York State
-              boundary (not just this pilot AOI) — 33 real historical events intersect New York, versus 3 for the
-              small pilot area alone, with over 1,200 real positive flood-observation pixels statewide. Building
-              the statewide training table from this real data is an active, ongoing part of this project; see{" "}
-              <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> for the latest numbers
-              once that run completes, and <code className="rounded bg-surface-2 px-1 py-0.5">docs/TRAINING_DATA_AUDIT.md</code>{" "}
-              for the full source-by-source accounting.
+              boundary — 24 real historical events, 6,830 real event-cell rows, and 1,130 real positive flood
+              observations (16.5%), versus 3 events and 38 positives for the pilot area alone. A gradient-boosted
+              model evaluated with 5-fold grouped cross-validation by event reaches a mean ROC-AUC of{" "}
+              <span className="font-mono text-ink">0.799</span> (logistic regression: <span className="font-mono text-ink">0.722</span>)
+              — lower than the pilot&apos;s small-sample numbers, and more believable precisely because of that. One
+              real predictor (distance to water) had to be dropped statewide because Overpass reliably times out
+              at this tile scale — a real, documented limitation, not hidden. See{" "}
+              <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> and{" "}
+              <code className="rounded bg-surface-2 px-1 py-0.5">docs/TRAINING_DATA_AUDIT.md</code> for full numbers.
+              Still experimental — not what generates the map&apos;s scores.
             </p>
           </div>
         </section>

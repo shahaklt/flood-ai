@@ -45,3 +45,11 @@ Given the 3 real, geographically-relevant positive events found above, the pilot
 4. As the pipeline expands to more of Westchester/New York State (see `docs/STUDENT_CHECKPOINTS.md` stretch goals), more real GFD events and, if the pilot area is extended into NYC, the Stormwater/311 layers become available, which is expected to substantially increase the usable positive/negative sample size.
 
 This is not a workaround — it is exactly the spec's own required behavior: real audited data drives the decision, and the system never invents labels to force a bigger model than the real data supports.
+
+## Update: statewide expansion
+
+Step 4 above has since happened. Querying the real Global Flood Database against the entire real New York State boundary (not the small pilot bbox) found **33 real events intersecting New York** (vs. 9 for the pilot bbox), of which **24 produced usable event-cell rows** after excluding permanent water and low-observation-quality pixels (`scripts/data_pipeline/sources/gfd_labels_nystate.py`, `scripts/training/build_statewide_training_table.py`).
+
+- **Resolution tradeoff**: statewide labels are downloaded at 2000 m/pixel rather than the pilot's 250 m, because Earth Engine's synchronous `getDownloadURL` hits a real server-side "User memory limit exceeded" error on a region this large at finer scales (measured: 1000 m fails, 2000 m succeeds). Real features are sampled at the same coarse scale for consistency — not presenting false statewide precision.
+- **A real new gap, found and documented rather than hidden**: `distanceToWaterM` is missing for 96% of statewide rows because the OSM Overpass water query reliably times out on the much larger z=9 tile bounding boxes used for statewide feature extraction (it works fine at the pilot's smaller z=13 scale). The statewide model drops this feature rather than imputing a fabricated value. USGS NHD flowlines (not Overpass-dependent) are the likely real fix, not yet implemented.
+- **Result**: 6,830 usable real rows, 1,130 real positives (16.5% — far more balanced than the pilot's 1.1%), across 24 real events and 81 real tiles. See `docs/EVALUATION.md` for the resulting model comparison.
