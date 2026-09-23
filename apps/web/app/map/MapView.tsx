@@ -1,11 +1,11 @@
 "use client";
 
-import { RAINFALL_SCENARIOS, type FacilityExposure, type RiskFeatures, type RiskResult, type RoadSegmentExposure } from "@flood-ai/shared";
+import { RAINFALL_SCENARIOS, type FacilityExposure, type HydrologicSoilGroup, type RiskFeatures, type RiskResult, type RoadSegmentExposure } from "@flood-ai/shared";
 import { aggregateExposure, estimatedAccessDisruptionScore } from "@flood-ai/risk-runtime";
 import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapLayerMouseEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
-import { RISK_RAMP_LEGEND, UNSUPPORTED_COLOR, riskColor } from "@/lib/colorRamp";
+import { FEMA_NON_SFHA_COLOR, FEMA_SFHA_COLOR, RISK_RAMP_LEGEND, SOIL_GROUP_COLORS, UNSUPPORTED_COLOR, riskColor } from "@/lib/colorRamp";
 import { tileKey, tilesForBounds } from "@/lib/tileMath";
 import type { RiskWorkerRequest, RiskWorkerResponse } from "./riskWorker";
 
@@ -49,6 +49,7 @@ interface RawTileCell {
   imperviousPct: number | null;
   distanceToWaterM: number | null;
   femaSfha: boolean;
+  hydrologicSoilGroup: HydrologicSoilGroup | null;
   relativeElevationZ: number | null;
   coverageTier: RiskFeatures["coverageTier"];
 }
@@ -85,6 +86,7 @@ export default function MapView() {
   const [selectedCell, setSelectedCell] = useState<RiskResult | null>(null);
   const [selectedExposure, setSelectedExposure] = useState<SelectedExposure | null>(null);
   const [hoveredScore, setHoveredScore] = useState<number | null>(null);
+  const [displayMode, setDisplayMode] = useState<"risk" | "fema" | "soil">("risk");
   const [showRoads, setShowRoads] = useState(true);
   const [showFacilities, setShowFacilities] = useState(true);
   const [showIntersections, setShowIntersections] = useState(false);
@@ -131,6 +133,7 @@ export default function MapView() {
                     distanceToWaterM: c.distanceToWaterM,
                     distanceToRoadM: null,
                     femaSfha: c.femaSfha,
+                    hydrologicSoilGroup: c.hydrologicSoilGroup,
                     relativeElevationZ: c.relativeElevationZ,
                   },
                 });
@@ -321,7 +324,18 @@ export default function MapView() {
         type: "FeatureCollection",
         features: Array.from(cellsById.values()).map((f) => {
           const r = results.get(f.properties.cellId);
-          const fillColor = r && r.coverageTier !== "unsupported" ? riskColor(r.riskScore) : UNSUPPORTED_COLOR;
+          const unsupported = !r || r.coverageTier === "unsupported";
+          let fillColor: string;
+          if (unsupported) {
+            fillColor = UNSUPPORTED_COLOR;
+          } else if (displayMode === "fema") {
+            fillColor = f.properties.femaSfha ? FEMA_SFHA_COLOR : FEMA_NON_SFHA_COLOR;
+          } else if (displayMode === "soil") {
+            const g = f.properties.hydrologicSoilGroup;
+            fillColor = g ? SOIL_GROUP_COLORS[g] : UNSUPPORTED_COLOR;
+          } else {
+            fillColor = riskColor(r.riskScore);
+          }
           return {
             type: "Feature",
             geometry: f.geometry,
@@ -332,7 +346,7 @@ export default function MapView() {
     };
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
-  }, [results, cellsById]);
+  }, [results, cellsById, displayMode]);
 
   // Push computed road exposure into the roads source.
   useEffect(() => {
@@ -465,6 +479,22 @@ export default function MapView() {
         </div>
 
         <div className="border-b border-border px-3 py-2">
+          <label htmlFor="display-mode-select" className="block font-mono text-[10px] uppercase tracking-wide text-ink-muted">
+            Grid highlights
+          </label>
+          <select
+            id="display-mode-select"
+            className="mt-1 w-full rounded border border-border bg-surface-2 px-2 py-1 text-sm text-ink focus:border-accent focus:outline-none"
+            value={displayMode}
+            onChange={(e) => setDisplayMode(e.target.value as typeof displayMode)}
+          >
+            <option value="risk">Risk score</option>
+            <option value="fema">FEMA flood zone (SFHA)</option>
+            <option value="soil">Soil drainage (USDA)</option>
+          </select>
+        </div>
+
+        <div className="border-b border-border px-3 py-2">
           <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Layers</p>
           <div className="mt-1.5 flex flex-col gap-1 text-xs text-ink">
             <label className="flex items-center gap-1.5">
@@ -502,19 +532,51 @@ export default function MapView() {
       </div>
 
       <div className="absolute bottom-3 left-3 z-10 rounded border border-border bg-surface/95 p-3">
-        <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Susceptibility index</p>
-        <div className="mt-2 flex h-2.5 w-56 overflow-hidden rounded-sm">
-          {RISK_RAMP_LEGEND.map(([, color]) => (
-            <div key={color} className="flex-1" style={{ backgroundColor: color }} />
-          ))}
-        </div>
-        <div className="mt-1 flex justify-between font-mono text-[10px] tabular text-ink-muted">
-          <span>000</span>
-          <span>025</span>
-          <span>050</span>
-          <span>075</span>
-          <span>100</span>
-        </div>
+        {displayMode === "risk" && (
+          <>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Susceptibility index</p>
+            <div className="mt-2 flex h-2.5 w-56 overflow-hidden rounded-sm">
+              {RISK_RAMP_LEGEND.map(([, color]) => (
+                <div key={color} className="flex-1" style={{ backgroundColor: color }} />
+              ))}
+            </div>
+            <div className="mt-1 flex justify-between font-mono text-[10px] tabular text-ink-muted">
+              <span>000</span>
+              <span>025</span>
+              <span>050</span>
+              <span>075</span>
+              <span>100</span>
+            </div>
+          </>
+        )}
+        {displayMode === "fema" && (
+          <>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">FEMA flood zone</p>
+            <div className="mt-2 flex flex-col gap-1 text-[10px] text-ink-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5" style={{ backgroundColor: FEMA_SFHA_COLOR }} />
+                Special Flood Hazard Area
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5" style={{ backgroundColor: FEMA_NON_SFHA_COLOR }} />
+                Outside mapped SFHA
+              </span>
+            </div>
+          </>
+        )}
+        {displayMode === "soil" && (
+          <>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Hydrologic soil group (USDA)</p>
+            <div className="mt-2 flex flex-col gap-1 text-[10px] text-ink-muted">
+              {(Object.entries(SOIL_GROUP_COLORS) as [keyof typeof SOIL_GROUP_COLORS, string][]).map(([g, color]) => (
+                <span key={g} className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5" style={{ backgroundColor: color }} />
+                  {g} — {g === "A" ? "well-drained, low runoff" : g === "D" ? "poorly drained, high runoff" : "moderate"}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
         <div className="mt-2 flex items-center gap-1.5 text-[10px] text-ink-muted">
           <span className="inline-block h-2 w-2" style={{ backgroundColor: UNSUPPORTED_COLOR }} />
           unsupported / no coverage
