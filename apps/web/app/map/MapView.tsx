@@ -29,6 +29,16 @@ const FACILITIES_SOURCE_ID = "facilities";
 const FACILITIES_LAYER_ID = "facilities-circle";
 const INTERSECTIONS_SOURCE_ID = "intersections";
 const INTERSECTIONS_LAYER_ID = "intersections-circle";
+const REPORTS_SOURCE_ID = "community-reports";
+const REPORTS_LAYER_ID = "community-reports-circle";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  street_flooding: "Street flooding",
+  basement_flooding: "Basement flooding",
+  storm_drain_backup: "Storm drain backup",
+  road_closure: "Road closure",
+  other: "Other",
+};
 
 type CellFeature = GeoJSON.Feature<GeoJSON.Polygon, RiskFeatures>;
 type RoadRawProps = { segmentId: string; highwayClass: string; isMajor: boolean; name: string | null; lengthM: number; nearCellIds: string[] };
@@ -66,6 +76,17 @@ type SelectedExposure =
   | { kind: "road"; name: string; exposure: RoadSegmentExposure }
   | { kind: "facility"; name: string; exposure: FacilityExposure };
 
+interface CommunityReport {
+  id: string;
+  submittedAt: string;
+  lat: number;
+  lon: number;
+  category: string;
+  severity: number;
+  description: string | null;
+  placeLabel: string | null;
+}
+
 export default function MapView() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -88,6 +109,9 @@ export default function MapView() {
   const [showRoads, setShowRoads] = useState(true);
   const [showFacilities, setShowFacilities] = useState(true);
   const [showIntersections, setShowIntersections] = useState(false);
+  const [showReports, setShowReports] = useState(true);
+  const [communityReports, setCommunityReports] = useState<CommunityReport[]>([]);
+  const [selectedReport, setSelectedReport] = useState<CommunityReport | null>(null);
 
   const selectedFeature: RiskFeatures | null = selectedCell
     ? (cellsById.get(selectedCell.cellId)?.properties ?? null)
@@ -259,6 +283,29 @@ export default function MapView() {
         paint: { "circle-radius": 2.5, "circle-color": "#64748b" },
       });
 
+      map.addSource(REPORTS_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({
+        id: REPORTS_LAYER_ID,
+        type: "circle",
+        source: REPORTS_SOURCE_ID,
+        paint: {
+          "circle-radius": ["+", 4, ["*", 1.5, ["get", "severity"]]],
+          "circle-color": "#f97316",
+          "circle-stroke-color": "#1e293b",
+          "circle-stroke-width": 1.5,
+          "circle-opacity": 0.9,
+        },
+      });
+      map.on("click", REPORTS_LAYER_ID, (e: MapLayerMouseEvent) => {
+        const f = e.features?.[0];
+        if (!f?.properties) return;
+        setSelectedCell(null);
+        setSelectedExposure(null);
+        setSelectedReport(JSON.parse(f.properties.reportJson as string) as CommunityReport);
+      });
+      map.on("mouseenter", REPORTS_LAYER_ID, () => (map.getCanvas().style.cursor = "pointer"));
+      map.on("mouseleave", REPORTS_LAYER_ID, () => (map.getCanvas().style.cursor = ""));
+
       map.on("mousemove", GRID_FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
         const f = e.features?.[0];
         if (f) {
@@ -275,6 +322,7 @@ export default function MapView() {
         if (!f) return;
         const cellId = f.properties?.cellId as string;
         setSelectedExposure(null);
+        setSelectedReport(null);
         setSelectedCell(resultsRef.current.get(cellId) ?? null);
       });
 
@@ -282,6 +330,7 @@ export default function MapView() {
         const f = e.features?.[0];
         if (!f?.properties) return;
         setSelectedCell(null);
+        setSelectedReport(null);
         setSelectedExposure({
           kind: "road",
           name: (f.properties.name as string) || (f.properties.highwayClass as string) || "Road segment",
@@ -292,6 +341,7 @@ export default function MapView() {
         const f = e.features?.[0];
         if (!f?.properties) return;
         setSelectedCell(null);
+        setSelectedReport(null);
         setSelectedExposure({
           kind: "facility",
           name: f.properties.name as string,
@@ -409,6 +459,42 @@ export default function MapView() {
     else map.once("load", apply);
   }, [results, rawFacilities]);
 
+  // Real community reports (see /reports) -- fetched once; the map is a
+  // read-only view of them here, submission happens on the dedicated page.
+  useEffect(() => {
+    fetch("/api/reports")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => body?.reports && setCommunityReports(body.reports))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const source = map.getSource(REPORTS_SOURCE_ID) as GeoJSONSource | undefined;
+      if (!source) return;
+      source.setData({
+        type: "FeatureCollection",
+        features: communityReports.map((r) => ({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+          properties: { severity: r.severity, reportJson: JSON.stringify(r) },
+        })),
+      });
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [communityReports]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const setVis = () => map.setLayoutProperty(REPORTS_LAYER_ID, "visibility", showReports ? "visible" : "none");
+    if (map.isStyleLoaded()) setVis();
+    else map.once("load", setVis);
+  }, [showReports]);
+
   // Fetch + show intersections lazily only once the toggle is switched on.
   useEffect(() => {
     const map = mapRef.current;
@@ -478,6 +564,10 @@ export default function MapView() {
             <label className="flex items-center gap-1.5">
               <input type="checkbox" checked={showIntersections} onChange={(e) => setShowIntersections(e.target.checked)} />
               Intersections (candidate)
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="checkbox" checked={showReports} onChange={(e) => setShowReports(e.target.checked)} />
+              Community reports ({communityReports.length})
             </label>
           </div>
         </div>
@@ -632,9 +722,30 @@ export default function MapView() {
         </aside>
       )}
 
+      {selectedReport && (
+        <aside className="absolute right-3 top-3 z-10 w-80 max-w-[90vw] rounded border border-border bg-surface text-sm text-ink shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">Community report</span>
+            <button className="text-ink-muted hover:text-ink" onClick={() => setSelectedReport(null)} aria-label="Close report details">
+              ✕
+            </button>
+          </div>
+          <div className="border-b border-border px-3 py-3">
+            <p className="text-sm text-ink">{CATEGORY_LABELS[selectedReport.category] ?? selectedReport.category}</p>
+            <p className="mt-1 text-xs text-ink-muted">Severity {selectedReport.severity}/5</p>
+            {selectedReport.placeLabel && <p className="mt-1 text-xs text-ink-muted">{selectedReport.placeLabel}</p>}
+          </div>
+          {selectedReport.description && <p className="border-b border-border px-3 py-2 text-xs text-ink">{selectedReport.description}</p>}
+          <p className="px-3 py-2 font-mono text-[10px] text-ink-muted">
+            submitted {new Date(selectedReport.submittedAt).toLocaleString()}
+          </p>
+        </aside>
+      )}
+
       <p className="absolute bottom-3 right-3 z-10 max-w-64 rounded border border-border bg-surface/90 p-2 text-[10px] text-ink-muted">
         Road and facility colors use the same scale as the cell heatmap; intersections are a coarse OSM-derived
-        candidate list, shown ungraded pending a dedicated exposure model.
+        candidate list, shown ungraded pending a dedicated exposure model. Orange dots are real, first-hand
+        community observations (see /reports) — sized by reported severity.
       </p>
     </div>
   );
