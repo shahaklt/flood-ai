@@ -60,11 +60,16 @@ Same real 23,662-row dataset, same 5-fold grouped CV, but reported via real out-
 | LightGBM (tuned) | 0.820 | 0.100 | 73.8% |
 | Real average of all three | 0.818 | 0.131 | 73.6% |
 | + real isotonic calibration | **0.821** | **0.036** | 59.5% @ threshold 0.5 |
-| + real optimal threshold (0.060, not 0.5) | 0.821 | 0.036 | **74.7%** |
+| + threshold picked on the SAME out-of-fold data it's scored on | 0.821 | 0.036 | 74.7% (optimistic — see below) |
+| + threshold picked via **nested** cross-validation (honest) | 0.821 | 0.036 | **73.8%** |
 
-**The real finding worth understanding, not just the number**: isotonic calibration gives real, correctly-shaped probabilities for a 4.7%-positive dataset — which means most of them sit well below 0.5, so the default 0.5 decision threshold badly under-predicts positives (balanced accuracy craters to 59.5%, barely above a coin flip) even though the *probabilities themselves* are the best-calibrated and best-discriminating of any model tried (0.821 ROC-AUC, 0.036 Brier — both the best in this entire evaluation history). Searching for the real threshold that maximizes balanced accuracy on this same data recovers the actual skill: **74.7% balanced accuracy at threshold ≈0.06** — the best real number across every experiment run this session, using only real data and standard, explainable ML technique (no new external data needed for this specific gain).
+**The real finding worth understanding, not just the number**: isotonic calibration gives real, correctly-shaped probabilities for a 4.7%-positive dataset — which means most of them sit well below 0.5, so the default 0.5 decision threshold badly under-predicts positives (balanced accuracy craters to 59.5%, barely above a coin flip) even though the *probabilities themselves* are the best-calibrated and best-discriminating of any model tried (0.821 ROC-AUC, 0.036 Brier — both the best in this entire evaluation history).
 
-**If asked "how accurate is the model": this is the answer** — 0.821 ROC-AUC, 74.7% balanced accuracy, from a real ensemble of three models with real calibration and a real threshold choice — while still being honest that this is an experimental model on 24 real events with `distanceToWaterM` excluded, not a validated production classifier, and not what the shipped map uses.
+**A second real finding, caught on review**: the first fix picked the threshold that maximized balanced accuracy on the exact same out-of-fold data that number was then reported on. The underlying probabilities were genuinely out-of-fold, but the *threshold selection itself* wasn't — it's a real, if easy-to-miss, form of leakage that optimistically inflates the reported score. Fixed with **nested threshold selection**: for each of the 5 folds, the threshold is chosen using only the other 4 folds' predictions, then applied to the held-out fold — so no threshold is ever chosen using the labels it's then scored against. The honest number drops slightly, from 74.7% to **73.8%**.
+
+Three plausible threshold-selection objectives were tested via this same nested method, not assumed — maximizing balanced accuracy (73.8% nested balanced accuracy), F1 (64.7%), and Matthews correlation coefficient (62.9%). Balanced accuracy is both the metric reported throughout this evaluation and the self-consistent winner for itself, so it's kept as the threshold objective; F1/MCC-optimized thresholds trade balanced accuracy for a different precision/recall balance on the minority class, a legitimate but different deployment choice, not a worse result. Full comparison: `data/models/statewide_ensemble_eval.json`'s `thresholdObjectiveComparison`. Interactive version: `/model`.
+
+**If asked "how accurate is the model": this is the answer** — 0.821 ROC-AUC, 73.8% honest (nested) balanced accuracy, from a real ensemble of three models with real calibration and a real, leakage-checked threshold choice — while still being honest that this is an experimental model on 24 real events with `distanceToWaterM` excluded, not a validated production classifier, and not what the shipped map uses.
 
 Full machine-readable output: `data/models/statewide_ensemble_eval.json`.
 
@@ -79,7 +84,7 @@ Trained the same ensemble+calibration+threshold pipeline on the 13,008 real rows
 
 **Honest read**: adding `distanceToWaterM` changes nothing real (+0.001 ROC-AUC, -0.2pp balanced accuracy — noise, not signal). Elevation, topographic wetness index, and flow accumulation already encode water proximity information; the raw distance-to-water feature is redundant once those are present. This closes out the milestone below — the decision to drop `distanceToWaterM` from the main model stands, confirmed rather than assumed.
 
-Note the *subset* numbers (77.2% balanced accuracy) look higher than the full-dataset ensemble's 74.7%, but that subset only spans 12 real events vs. 24 — fewer, less diverse events make cross-validation look easier, not a genuinely better model. The full 24-event, 23,662-row result (0.821 ROC-AUC, 74.7% balanced accuracy) remains the honestly-reported best, because it's evaluated across the most real, diverse event coverage available.
+Note the *subset* numbers (77.2% balanced accuracy) look higher than the full-dataset ensemble's 73.8%, but that subset only spans 12 real events vs. 24 — fewer, less diverse events make cross-validation look easier, not a genuinely better model. The full 24-event, 23,662-row result (0.821 ROC-AUC, 73.8% honest nested balanced accuracy) remains the honestly-reported best, because it's evaluated across the most real, diverse event coverage available.
 
 Full machine-readable output: `data/models/statewide_water_variant_eval.json`.
 

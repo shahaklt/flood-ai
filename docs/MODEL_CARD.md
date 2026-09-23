@@ -47,7 +47,7 @@
 
 **Training data**: 23,662 real rows, 1,110 real positives (4.7%), from 24 real historical events across 86 real z=9 tiles statewide, including a real second water source (USGS NHD) and a real hydrology feature (topographic wetness index) added after the first iteration. See `docs/EVALUATION.md`.
 
-**Evaluation**: 5-fold grouped cross-validation by event. Best real result overall (see `statewide-ensemble-v0.1.0` in `docs/EVALUATION.md`): a real average ensemble of logistic regression + gradient-boosted trees + LightGBM, isotonic-calibrated, evaluated at a real threshold chosen to maximize balanced accuracy (not the default 0.5, which is the wrong cutoff at this dataset's 4.7% positive rate) — **0.821 ROC-AUC, 74.7% balanced accuracy**. (An unweighted single GBM reports 95.8% raw accuracy, barely above the 95.3% trivial "always predict no-flood" baseline — reported and explained, not hidden.)
+**Evaluation**: 5-fold grouped cross-validation by event. Best real result overall (see `statewide-ensemble-v0.1.0` in `docs/EVALUATION.md`): a real average ensemble of logistic regression + gradient-boosted trees + LightGBM, isotonic-calibrated, evaluated at a real threshold chosen to maximize balanced accuracy (not the default 0.5, which is the wrong cutoff at this dataset's 4.7% positive rate) via **nested** cross-validated threshold selection (each fold's threshold chosen only from the other folds, to avoid leaking the evaluation labels into the threshold choice) — **0.821 ROC-AUC, 73.8% honest balanced accuracy**. (An unweighted single GBM reports 95.8% raw accuracy, barely above the 95.3% trivial "always predict no-flood" baseline — reported and explained, not hidden.)
 
 **Status**: Experimental. **Never used to generate a user-facing prediction.**
 
