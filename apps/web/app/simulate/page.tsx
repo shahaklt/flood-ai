@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function SimulatePage() {
   return (
-    <main className="flex h-screen w-screen flex-col">
-      <div className="flex-1">
+    <main className="flex min-h-0 flex-1 flex-col">
+      <div className="min-h-0 flex-1">
         <SimulateView />
       </div>
       <p className="border-t border-border bg-surface px-3 py-1 text-center text-[11px] text-ink-muted">

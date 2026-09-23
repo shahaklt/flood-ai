@@ -68,8 +68,22 @@ Same real 23,662-row dataset, same 5-fold grouped CV, but reported via real out-
 
 Full machine-readable output: `data/models/statewide_ensemble_eval.json`.
 
+## distanceToWaterM variant — real result: no improvement (`statewide-water-variant-v0.1.0`)
+
+Trained the same ensemble+calibration+threshold pipeline on the 13,008 real rows (12 real events, 5.8% positive) where NHD actually found water, WITH vs. WITHOUT `distanceToWaterM`, on the identical subset so the comparison isolates one feature rather than conflating it with more/less data.
+
+| Feature set | Rows | Events | ROC-AUC | Balanced accuracy |
+|---|---|---|---|---|
+| Without distanceToWaterM | 13,008 | 12 | 0.846 | 77.2% |
+| With distanceToWaterM | 13,008 | 12 | 0.847 | 77.0% |
+
+**Honest read**: adding `distanceToWaterM` changes nothing real (+0.001 ROC-AUC, -0.2pp balanced accuracy — noise, not signal). Elevation, topographic wetness index, and flow accumulation already encode water proximity information; the raw distance-to-water feature is redundant once those are present. This closes out the milestone below — the decision to drop `distanceToWaterM` from the main model stands, confirmed rather than assumed.
+
+Note the *subset* numbers (77.2% balanced accuracy) look higher than the full-dataset ensemble's 74.7%, but that subset only spans 12 real events vs. 24 — fewer, less diverse events make cross-validation look easier, not a genuinely better model. The full 24-event, 23,662-row result (0.821 ROC-AUC, 74.7% balanced accuracy) remains the honestly-reported best, because it's evaluated across the most real, diverse event coverage available.
+
+Full machine-readable output: `data/models/statewide_water_variant_eval.json`.
+
 ## Next real evaluation milestones
 
-- Train a distanceToWaterM-included variant on the ~55% of rows where NHD found real water, and compare directly against the full-sample no-water-feature model rather than guessing which is better.
 - Move from 5-fold cross-validation to a locked train/validation/test split with calibration fit only on validation data, once enough events support it.
 - Re-run this same honest process as more real events/data sources are added, and update this table rather than replacing it silently.
