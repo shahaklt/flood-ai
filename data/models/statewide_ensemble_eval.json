@@ -1,0 +1,100 @@
+{
+  "modelId": "statewide-ensemble-v0.1.0",
+  "status": "EXPERIMENTAL \u2014 not used for production predictions",
+  "generatedAt": "2026-09-23T08:03:02.439200+00:00",
+  "trainingRows": 23662,
+  "positiveRows": 1110,
+  "positiveRate": 0.04691065843969233,
+  "events": 24,
+  "featureColumns": [
+    "elevationM",
+    "slopeDegrees",
+    "flowAccumulation",
+    "topographicWetnessIndex",
+    "relativeElevationZ",
+    "landCoverClass",
+    "imperviousPct",
+    "femaSfha"
+  ],
+  "results": [
+    {
+      "model": "logistic_regression",
+      "threshold": 0.5,
+      "rocAuc": 0.7331308183848979,
+      "brierScore": 0.19221585303863423,
+      "rawAccuracy": 0.7101682021807116,
+      "balancedAccuracy": 0.6667891863129536
+    },
+    {
+      "model": "gradient_boosted_trees_balanced",
+      "threshold": 0.5,
+      "rocAuc": 0.8087899956536885,
+      "brierScore": 0.13630771455082683,
+      "rawAccuracy": 0.8311638914715578,
+      "balancedAccuracy": 0.731549547951641
+    },
+    {
+      "model": "lightgbm_tuned",
+      "threshold": 0.5,
+      "rocAuc": 0.8201129162152575,
+      "brierScore": 0.10041197497755736,
+      "rawAccuracy": 0.8781168117657003,
+      "balancedAccuracy": 0.7381937719912179
+    },
+    {
+      "model": "ensemble_average",
+      "threshold": 0.5,
+      "rocAuc": 0.817680919212934,
+      "brierScore": 0.13097227396403444,
+      "rawAccuracy": 0.8523370805510946,
+      "balancedAccuracy": 0.7362330182257462
+    },
+    {
+      "model": "ensemble_isotonic_calibrated (threshold=0.5)",
+      "threshold": 0.5,
+      "rocAuc": 0.8210045092982305,
+      "brierScore": 0.03649782512249031,
+      "rawAccuracy": 0.9575268362775758,
+      "balancedAccuracy": 0.5948363182267049
+    },
+    {
+      "model": "ensemble_isotonic_calibrated (optimal threshold)",
+      "threshold": 0.05970982142857143,
+      "rocAuc": 0.8210045092982305,
+      "brierScore": 0.03649782512249031,
+      "rawAccuracy": 0.7956639337334123,
+      "balancedAccuracy": 0.7471882799791633
+    }
+  ],
+  "best": {
+    "model": "ensemble_isotonic_calibrated (threshold=0.5)",
+    "threshold": 0.5,
+    "rocAuc": 0.8210045092982305,
+    "brierScore": 0.03649782512249031,
+    "rawAccuracy": 0.9575268362775758,
+    "balancedAccuracy": 0.5948363182267049
+  },
+  "calibrationCurve": {
+    "meanPredicted": [
+      0.007651363938788653,
+      0.012658227848101326,
+      0.017979284737151772,
+      0.02282661486158314,
+      0.028888009497428258,
+      0.05195961995249635,
+      0.08176100628930918,
+      0.26738491674828485
+    ],
+    "fractionPositive": [
+      0.007651363938789089,
+      0.012658227848101266,
+      0.017979284737150675,
+      0.022826614861583293,
+      0.02888800949742778,
+      0.05195961995249406,
+      0.08176100628930817,
+      0.267384916748286
+    ]
+  },
+  "isSynthetic": false
+}
