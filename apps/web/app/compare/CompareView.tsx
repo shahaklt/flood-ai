@@ -3,6 +3,7 @@
 import { computeBaselineRisk } from "@flood-ai/risk-runtime";
 import { RAINFALL_SCENARIOS, type RiskFeatures, type RiskResult } from "@flood-ai/shared";
 import { useState } from "react";
+import CountUp from "../components/CountUp";
 import { riskColor } from "@/lib/colorRamp";
 import { DATA_VERSION, FEATURE_TILE_ZOOM, rawCellToFeatures, type RawTileCell, type TileResponse } from "@/lib/riskTile";
 import { lonLatToTile } from "@/lib/tileMath";
@@ -168,7 +169,15 @@ export default function CompareView() {
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {slots.map((slot) => (
-          <div key={slot.id} className="border border-border bg-surface p-4">
+          <div
+            key={slot.id}
+            className="border border-border bg-surface p-4 transition-all duration-300"
+            style={
+              slot.status === "done"
+                ? { boxShadow: `0 0 0 1px ${riskColor(slot.result!.riskScore)}22, 0 4px 16px -4px ${riskColor(slot.result!.riskScore)}33` }
+                : undefined
+            }
+          >
             <div className="flex gap-2">
               <input
                 value={slot.query}
@@ -213,7 +222,7 @@ export default function CompareView() {
             {slot.status === "error" && <p className="mt-2 text-xs text-danger">{slot.errorMessage}</p>}
 
             {slot.status === "done" && slot.result && slot.picked && (
-              <div className="mt-3">
+              <div className="mt-3 animate-[fadeIn_0.4s_ease-out]">
                 <p className="truncate text-xs text-ink-muted" title={slot.picked.label}>
                   {slot.picked.label}
                 </p>
@@ -222,7 +231,7 @@ export default function CompareView() {
                     className="font-mono text-3xl tabular"
                     style={{ color: riskColor(slot.result.riskScore) }}
                   >
-                    {slot.result.riskScore}
+                    <CountUp value={slot.result.riskScore} durationMs={700} />
                   </span>
                   <span className="text-sm capitalize text-ink-muted">
                     {slot.result.riskCategory.replace("_", " ")}
@@ -269,7 +278,7 @@ export default function CompareView() {
               {[...doneSlots]
                 .sort((a, b) => b.result!.riskScore - a.result!.riskScore)
                 .map((s) => (
-                  <tr key={s.id} className="border-b border-border last:border-0">
+                  <tr key={s.id} className="border-b border-border transition-colors last:border-0 hover:bg-surface-2">
                     <td className="max-w-[220px] truncate px-3 py-2 text-ink-muted" title={s.picked?.label}>
                       {s.picked?.label}
                     </td>

@@ -3,6 +3,7 @@
 import { computeBaselineRisk } from "@flood-ai/risk-runtime";
 import { RAINFALL_SCENARIOS, type RiskCategory, type RiskFeatures, type RiskResult } from "@flood-ai/shared";
 import { useMemo, useState } from "react";
+import CountUp from "../components/CountUp";
 import { riskColor } from "@/lib/colorRamp";
 import { suggestBestIntervention } from "@/lib/interventionTypes";
 import { DATA_VERSION, FEATURE_TILE_ZOOM, rawCellToFeatures, type TileResponse } from "@/lib/riskTile";
@@ -198,14 +199,22 @@ export default function MunicipalView() {
       {status === "error" && errorMessage && <p className="mt-2 text-xs text-danger">{errorMessage}</p>}
 
       {status === "loading" && (
-        <p className="mt-4 text-sm text-ink-muted">
-          Fetching real tile data: {progress.done}/{progress.total}
-          {truncated && " (area truncated to the largest supported tile count)"}
-        </p>
+        <div className="mt-4">
+          <p className="text-sm text-ink-muted">
+            Fetching real tile data: {progress.done}/{progress.total}
+            {truncated && " (area truncated to the largest supported tile count)"}
+          </p>
+          <div className="mt-2 h-1 w-full max-w-sm overflow-hidden bg-surface-2">
+            <div
+              className="h-1 bg-accent transition-[width] duration-300 ease-out"
+              style={{ width: `${progress.total ? (progress.done / progress.total) * 100 : 0}%` }}
+            />
+          </div>
+        </div>
       )}
 
       {(status === "done" || (status === "loading" && cells.length > 0)) && picked && (
-        <div className="mt-6">
+        <div className="mt-6 animate-[fadeIn_0.4s_ease-out]">
           <div className="flex items-center justify-between">
             <p className="text-sm text-ink-muted">
               {picked.label}
@@ -232,16 +241,20 @@ export default function MunicipalView() {
           </div>
 
           <div className="mt-4 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
-            <div className="bg-surface p-4">
-              <p className="font-mono text-2xl tabular text-ink">{cells.length}</p>
+            <div className="bg-surface p-4 transition-colors hover:bg-surface-2">
+              <p className="font-mono text-2xl tabular text-ink">
+                <CountUp value={cells.length} />
+              </p>
               <p className="mt-1 text-xs text-ink-muted">real analysis cells scored</p>
             </div>
-            <div className="bg-surface p-4">
-              <p className="font-mono text-2xl tabular text-ink">{meanScore?.toFixed(1)}</p>
+            <div className="bg-surface p-4 transition-colors hover:bg-surface-2">
+              <p className="font-mono text-2xl tabular text-ink">
+                {meanScore !== null && <CountUp value={meanScore} decimals={1} />}
+              </p>
               <p className="mt-1 text-xs text-ink-muted">mean risk score</p>
             </div>
-            <div className="bg-surface p-4">
-              <p className="font-mono text-2xl tabular text-ink">{p90Score}</p>
+            <div className="bg-surface p-4 transition-colors hover:bg-surface-2">
+              <p className="font-mono text-2xl tabular text-ink">{p90Score !== null && <CountUp value={p90Score} />}</p>
               <p className="mt-1 text-xs text-ink-muted">90th percentile risk score</p>
             </div>
           </div>
@@ -253,6 +266,7 @@ export default function MunicipalView() {
                 count > 0 ? (
                   <div
                     key={cat}
+                    className="transition-all duration-500 ease-out hover:brightness-125"
                     style={{ width: `${(count / cells.length) * 100}%`, backgroundColor: riskColor(CATEGORY_ORDER.indexOf(cat) * 25) }}
                     title={`${CATEGORY_LABELS[cat]}: ${count}`}
                   />
@@ -284,7 +298,7 @@ export default function MunicipalView() {
                 {topCells.map((c, i) => {
                   const suggestion = suggestions.get(c.cellId);
                   return (
-                    <tr key={c.cellId} className="border-b border-border last:border-0">
+                    <tr key={c.cellId} className="border-b border-border transition-colors last:border-0 hover:bg-surface-2">
                       <td className="px-3 py-2 text-ink-muted">{i + 1}</td>
                       <td className="px-3 py-2 font-mono tabular" style={{ color: riskColor(c.riskScore) }}>
                         {c.riskScore}

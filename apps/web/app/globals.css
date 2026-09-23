@@ -56,6 +56,11 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Starts already visible so content never disappears if JS/IO can't run
    (headless renderers, reduced-motion agents); only animates the reveal
    once an IntersectionObserver confirms the element is on screen. */
