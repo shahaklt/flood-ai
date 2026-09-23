@@ -25,34 +25,42 @@ export default function PageNav() {
 
   return (
     <div className="fixed bottom-4 left-4 z-50">
-      {open && (
-        <ul className="mb-1.5 w-40 border border-border bg-surface text-xs shadow-lg">
-          {PAGES.map((p) => {
-            const active = p === current;
-            return (
-              <li key={p.href}>
-                <Link
-                  href={p.href}
-                  onClick={() => setOpen(false)}
-                  className={
-                    "block px-3 py-1.5 " +
-                    (active ? "bg-surface-2 text-ink" : "text-ink-muted hover:bg-surface-2 hover:text-ink")
-                  }
-                >
-                  {p.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <ul
+        className="mb-1.5 w-40 origin-bottom-left overflow-hidden border border-border bg-surface text-xs shadow-lg transition-[transform,opacity] duration-200 ease-out"
+        style={{
+          transform: open ? "scale(1)" : "scale(0.95)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          maxHeight: open ? "20rem" : 0,
+        }}
+      >
+        {PAGES.map((p) => {
+          const active = p === current;
+          return (
+            <li key={p.href}>
+              <Link
+                href={p.href}
+                onClick={() => setOpen(false)}
+                className={
+                  "block px-3 py-1.5 transition-colors " +
+                  (active ? "bg-surface-2 text-ink" : "text-ink-muted hover:bg-surface-2 hover:text-ink")
+                }
+              >
+                {p.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Navigate FloodAI pages"
         className="flex items-center gap-1.5 border border-border bg-surface px-2.5 py-1.5 font-mono text-[11px] text-ink-muted shadow-lg transition-colors hover:text-ink"
       >
-        <span className="text-accent">⊕</span>
+        <span className="inline-block text-accent transition-transform duration-200" style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}>
+          ⊕
+        </span>
         {current?.label ?? "Menu"}
       </button>
     </div>

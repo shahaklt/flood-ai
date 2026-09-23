@@ -27,9 +27,17 @@ export default function NavBar() {
             <Link
               key={link.href}
               href={link.href}
-              className={active ? "text-ink" : "text-ink-muted hover:text-ink"}
+              className={
+                "group relative py-1 transition-colors " + (active ? "text-ink" : "text-ink-muted hover:text-ink")
+              }
             >
               {link.label}
+              <span
+                className={
+                  "absolute inset-x-0 -bottom-0.5 h-px origin-left bg-accent transition-transform duration-200 " +
+                  (active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100")
+                }
+              />
             </Link>
           );
         })}
