@@ -6,7 +6,9 @@ import Link from "next/link";
 import { BASELINE_WEIGHTS_VERSION } from "@flood-ai/shared";
 import CountUp from "../components/CountUp";
 import RevealOnScroll from "../components/RevealOnScroll";
+import ScrollProgressBar from "../components/ScrollProgressBar";
 import ThresholdExplorer, { type ThresholdSweepPoint } from "../components/ThresholdExplorer";
+import WeightsBreakdown from "../components/WeightsBreakdown";
 
 export const metadata: Metadata = {
   title: "FloodAI — Impact",
@@ -46,7 +48,7 @@ function Stat({
   source: string;
 }) {
   return (
-    <div className="border border-border bg-surface p-4 transition-colors hover:bg-surface-2">
+    <div className="border border-border bg-surface p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-2 hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.4)]">
       <p className="font-mono text-2xl tabular text-ink sm:text-3xl">
         {countTo !== undefined ? <CountUp value={countTo} decimals={decimals} prefix={prefix} suffix={suffix} /> : value}
       </p>
@@ -61,6 +63,7 @@ export default async function ImpactPage() {
 
   return (
     <main className="bg-bg text-ink">
+      <ScrollProgressBar />
       <div className="mx-auto max-w-4xl px-6 py-16">
         <p className="font-mono text-xs tracking-wide text-accent">IMPACT</p>
         <h1 className="mt-2 text-3xl font-medium leading-tight sm:text-4xl">
@@ -199,6 +202,14 @@ export default async function ImpactPage() {
                 input can never lower a score, and missing real data reduces confidence instead of silently
                 becoming a fabricated zero-risk reading.
               </p>
+              <div className="mt-4">
+                <p className="text-[10px] uppercase tracking-wide text-ink-muted">
+                  Real weight of each factor — hover to inspect
+                </p>
+                <div className="mt-2">
+                  <WeightsBreakdown />
+                </div>
+              </div>
             </div>
 
             <div className="mt-4 border border-border bg-surface p-5">
