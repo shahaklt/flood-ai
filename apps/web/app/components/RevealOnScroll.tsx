@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /** Fades + lifts children into place the first time they enter the
- * viewport. Content is visible by default (no class-gated opacity: 0 with
- * no fallback) so it never ships blank to a renderer that can't fire
- * IntersectionObserver, and respects prefers-reduced-motion via CSS. */
+ * viewport. State always starts `false` identically on server and client
+ * (an env-dependent initializer here caused a real hydration mismatch,
+ * since `typeof IntersectionObserver` differs between the two) -- the
+ * effect below runs client-only, so branching there is safe. Layout.tsx
+ * carries a single `<noscript>` fallback keeping this visible if JS never
+ * runs at all. */
 export default function RevealOnScroll({
   children,
   delayMs = 0,
@@ -16,11 +19,17 @@ export default function RevealOnScroll({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState(() => typeof IntersectionObserver === "undefined");
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      // One-time client-only feature-detection fallback, not a cascading update.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setVisible(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
