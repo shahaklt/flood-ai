@@ -46,8 +46,8 @@ export default function Home() {
           <Link href="/municipal" className="text-accent underline underline-offset-2 hover:brightness-110">
             Municipal dashboard
           </Link>
-          <Link href="/reports" className="text-accent underline underline-offset-2 hover:brightness-110">
-            Community reports
+          <Link href="/model" className="text-accent underline underline-offset-2 hover:brightness-110">
+            Model internals
           </Link>
         </div>
 

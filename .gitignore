@@ -24,4 +24,3 @@ playwright-report/
 test-results/
 .pytest_cache/
 data/cache/
-data/community/

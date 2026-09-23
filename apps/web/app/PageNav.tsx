@@ -10,7 +10,7 @@ const PAGES = [
   { href: "/simulate", label: "Simulate" },
   { href: "/compare", label: "Compare" },
   { href: "/municipal", label: "Municipal" },
-  { href: "/reports", label: "Reports" },
+  { href: "/model", label: "Model" },
   { href: "/impact", label: "Impact" },
   { href: "/methodology", label: "Methodology" },
 ];
