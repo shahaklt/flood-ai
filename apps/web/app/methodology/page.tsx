@@ -22,11 +22,16 @@ export default function MethodologyPage() {
         <p className="mt-3 text-sm leading-relaxed text-ink">
           FloodAI ships the deterministic susceptibility baseline (
           <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-xs text-accent">{BASELINE_WEIGHTS_VERSION}</code>
-          ) for the Mamaroneck, NY pilot area. Every risk score is a{" "}
-          <strong className="text-ink">relative risk index</strong>, not a calibrated probability, computed only
-          from real public data (see <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-xs">data/metadata/sources.json</code>
-          ). Two conceptually useful factors — flow accumulation and soil infiltration — are not yet computed for
-          this pilot; every score&apos;s confidence is reduced to reflect that gap rather than hiding it.
+          ), computed live for any location in New York State from real public data (see{" "}
+          <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-xs">data/metadata/sources.json</code>
+          ). Every risk score is a <strong className="text-ink">relative risk index</strong>, not a calibrated
+          probability, built from eight real factors: elevation, slope, flow accumulation, topographic wetness
+          index, terrain curvature, water proximity, FEMA flood zone membership, and impervious surface. One
+          conceptually useful factor — soil infiltration (hydrologic soil group) — is not yet wired up; every
+          score&apos;s confidence is reduced to reflect that gap rather than hiding it. A separate experimental
+          statistical model, evaluated on 24 real historical flood events statewide, reaches 0.821 ROC-AUC / 74.7%
+          balanced accuracy (see <a href="/impact" className="text-accent underline">/impact</a>) but is not yet
+          used to generate the scores shown on the map.
         </p>
       </section>
 

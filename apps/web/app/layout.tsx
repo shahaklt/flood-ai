@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "FloodAI",
-  description: "Explainable flood-risk mapping and intervention planning for the Mamaroneck, NY pilot area.",
+  description: "Explainable, live flood-risk mapping and intervention planning for New York State.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
