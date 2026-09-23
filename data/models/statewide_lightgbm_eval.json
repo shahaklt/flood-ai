@@ -1,16 +1,18 @@
 {
   "modelId": "statewide-lightgbm-v0.1.0",
   "status": "EXPERIMENTAL \u2014 not used for production predictions",
-  "generatedAt": "2026-09-23T00:28:23.991383+00:00",
-  "trainingRows": 23662,
-  "positiveRows": 1110,
-  "positiveRate": 0.04691065843969233,
+  "generatedAt": "2026-09-23T14:03:14.827657+00:00",
+  "trainingRows": 21956,
+  "positiveRows": 1056,
+  "positiveRate": 0.04809619238476954,
   "events": 24,
   "featureColumns": [
     "elevationM",
     "slopeDegrees",
     "flowAccumulation",
     "topographicWetnessIndex",
+    "curvature",
+    "relativeElevationZ",
     "landCoverClass",
     "imperviousPct",
     "femaSfha"
@@ -26,50 +28,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8613377846088588,
-          "prAuc": 0.48000135671498695,
-          "brierScore": 0.14829924554014084,
-          "rawAccuracy": 0.8358854260493604,
-          "balancedAccuracy": 0.7803434790218948
+          "rocAuc": 0.8598645812840187,
+          "prAuc": 0.4901481357800729,
+          "brierScore": 0.1323577405568275,
+          "rawAccuracy": 0.8434895350990924,
+          "balancedAccuracy": 0.7990917437208997
         },
         {
           "fold": 1,
-          "rocAuc": 0.7668095238095238,
-          "prAuc": 0.2704348832610555,
-          "brierScore": 0.11395264675805988,
-          "rawAccuracy": 0.8759465478841871,
-          "balancedAccuracy": 0.6816912972085386
+          "rocAuc": 0.7518020512820511,
+          "prAuc": 0.28400377031465607,
+          "brierScore": 0.10037468370347453,
+          "rawAccuracy": 0.8925301204819277,
+          "balancedAccuracy": 0.6545641025641026
         },
         {
           "fold": 2,
-          "rocAuc": 0.7911800077457756,
-          "prAuc": 0.37097492747497474,
-          "brierScore": 0.14088414607354663,
-          "rawAccuracy": 0.8328970331588132,
-          "balancedAccuracy": 0.7303771260843358
+          "rocAuc": 0.8323190883190883,
+          "prAuc": 0.4189596209959256,
+          "brierScore": 0.12145791073651728,
+          "rawAccuracy": 0.858909090909091,
+          "balancedAccuracy": 0.7515811965811965
         },
         {
           "fold": 3,
-          "rocAuc": 0.7442362817362818,
-          "prAuc": 0.12918677768069495,
-          "brierScore": 0.12112610443447575,
-          "rawAccuracy": 0.8765240523165595,
-          "balancedAccuracy": 0.6995976658476659
+          "rocAuc": 0.8511276455026454,
+          "prAuc": 0.425522162331379,
+          "brierScore": 0.13304824112205843,
+          "rawAccuracy": 0.8281212699928384,
+          "balancedAccuracy": 0.7764133597883598
         },
         {
           "fold": 4,
-          "rocAuc": 0.7864438070486816,
-          "prAuc": 0.36930062605155106,
-          "brierScore": 0.12201257609745166,
-          "rawAccuracy": 0.8722934158197083,
-          "balancedAccuracy": 0.6963478279242732
+          "rocAuc": 0.6693897849462366,
+          "prAuc": 0.0831361724233624,
+          "brierScore": 0.10860517831174725,
+          "rawAccuracy": 0.8570730515514293,
+          "balancedAccuracy": 0.6065430107526881
         }
       ],
-      "meanRocAuc": 0.7900014809898243,
-      "stdRocAuc": 0.03933251714239096,
-      "meanBrier": 0.12925494378073493,
-      "meanRawAccuracy": 0.8587092950457256,
-      "meanBalancedAccuracy": 0.7176714792173418
+      "meanRocAuc": 0.7929006302668081,
+      "stdRocAuc": 0.07262560565075878,
+      "meanBrier": 0.119168750886125,
+      "meanRawAccuracy": 0.8560246136068758,
+      "meanBalancedAccuracy": 0.7176386826814494
     },
     {
       "params": {
@@ -81,50 +83,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8545902820631739,
-          "prAuc": 0.47716546154752315,
-          "brierScore": 0.14934969247146188,
-          "rawAccuracy": 0.8342640965591785,
-          "balancedAccuracy": 0.7668254765253988
+          "rocAuc": 0.8603737950029511,
+          "prAuc": 0.4883415754984721,
+          "brierScore": 0.13715304887126292,
+          "rawAccuracy": 0.8310798295980737,
+          "balancedAccuracy": 0.7925231162699193
         },
         {
           "fold": 1,
-          "rocAuc": 0.7635151888341543,
-          "prAuc": 0.251214172746021,
-          "brierScore": 0.11912780217676422,
-          "rawAccuracy": 0.8728285077951002,
-          "balancedAccuracy": 0.678419540229885
+          "rocAuc": 0.7529246153846154,
+          "prAuc": 0.2891370105962147,
+          "brierScore": 0.1000181918827859,
+          "rawAccuracy": 0.8908433734939759,
+          "balancedAccuracy": 0.6536666666666666
         },
         {
           "fold": 2,
-          "rocAuc": 0.7924515573570794,
-          "prAuc": 0.37534946966118754,
-          "brierScore": 0.1437230619554094,
-          "rawAccuracy": 0.8272251308900523,
-          "balancedAccuracy": 0.735365289025168
+          "rocAuc": 0.829123076923077,
+          "prAuc": 0.43519250813174537,
+          "brierScore": 0.12445029068535378,
+          "rawAccuracy": 0.850909090909091,
+          "balancedAccuracy": 0.7515384615384615
         },
         {
           "fold": 3,
-          "rocAuc": 0.7434817772317772,
-          "prAuc": 0.1351631801311975,
-          "brierScore": 0.12109252703020544,
-          "rawAccuracy": 0.8822877410773664,
-          "balancedAccuracy": 0.6849887387387388
+          "rocAuc": 0.8478994708994707,
+          "prAuc": 0.4303408627663406,
+          "brierScore": 0.1370375157498425,
+          "rawAccuracy": 0.8233468608259727,
+          "balancedAccuracy": 0.7688723544973545
         },
         {
           "fold": 4,
-          "rocAuc": 0.7869436432978364,
-          "prAuc": 0.3737862124269846,
-          "brierScore": 0.12232320176251871,
-          "rawAccuracy": 0.8747238179407866,
-          "balancedAccuracy": 0.697611614688979
+          "rocAuc": 0.663255376344086,
+          "prAuc": 0.07641818161538134,
+          "brierScore": 0.11051809911887814,
+          "rawAccuracy": 0.8617151233813829,
+          "balancedAccuracy": 0.5931639784946237
         }
       ],
-      "meanRocAuc": 0.7881964897568042,
-      "stdRocAuc": 0.03751368553683901,
-      "meanBrier": 0.13112325707927192,
-      "meanRawAccuracy": 0.8582658588524967,
-      "meanBalancedAccuracy": 0.7126421318416339
+      "meanRocAuc": 0.79071526691084,
+      "stdRocAuc": 0.07385345034292479,
+      "meanBrier": 0.12183542926162465,
+      "meanRawAccuracy": 0.8515788556416993,
+      "meanBalancedAccuracy": 0.7119529154934051
     },
     {
       "params": {
@@ -136,50 +138,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8532685700852309,
-          "prAuc": 0.48615765474055755,
-          "brierScore": 0.12962609774800213,
-          "rawAccuracy": 0.851017834624392,
-          "balancedAccuracy": 0.7804255669818589
+          "rocAuc": 0.859299626204997,
+          "prAuc": 0.5144472941914259,
+          "brierScore": 0.11347286944015529,
+          "rawAccuracy": 0.8683089461011299,
+          "balancedAccuracy": 0.8059321922749032
         },
         {
           "fold": 1,
-          "rocAuc": 0.7701929392446635,
-          "prAuc": 0.265666716369085,
-          "brierScore": 0.10416761015785361,
-          "rawAccuracy": 0.8726057906458797,
-          "balancedAccuracy": 0.6783004926108375
+          "rocAuc": 0.7528158974358974,
+          "prAuc": 0.3189241507389969,
+          "brierScore": 0.08756039423112365,
+          "rawAccuracy": 0.903855421686747,
+          "balancedAccuracy": 0.6830512820512821
         },
         {
           "fold": 2,
-          "rocAuc": 0.8002012154461247,
-          "prAuc": 0.3732805390581155,
-          "brierScore": 0.12599098614361037,
-          "rawAccuracy": 0.8490401396160558,
-          "balancedAccuracy": 0.7468674744403969
+          "rocAuc": 0.8263584045584046,
+          "prAuc": 0.429102423618365,
+          "brierScore": 0.1099247564296443,
+          "rawAccuracy": 0.8635151515151516,
+          "balancedAccuracy": 0.7519230769230769
         },
         {
           "fold": 3,
-          "rocAuc": 0.7559387796887796,
-          "prAuc": 0.16111659539784226,
-          "brierScore": 0.10887262753823364,
-          "rawAccuracy": 0.8738638882731101,
-          "balancedAccuracy": 0.6982340294840295
+          "rocAuc": 0.8543154761904761,
+          "prAuc": 0.42901835538410193,
+          "brierScore": 0.11941162490876331,
+          "rawAccuracy": 0.8479350680353306,
+          "balancedAccuracy": 0.7943498677248677
         },
         {
           "fold": 4,
-          "rocAuc": 0.7983679058908046,
-          "prAuc": 0.3846845477464761,
-          "brierScore": 0.10786375310284443,
-          "rawAccuracy": 0.8853292090145825,
-          "balancedAccuracy": 0.7224370351588911
+          "rocAuc": 0.6714274193548386,
+          "prAuc": 0.09003460943271044,
+          "brierScore": 0.09496526584497596,
+          "rawAccuracy": 0.8734424627412656,
+          "balancedAccuracy": 0.6254206989247312
         }
       ],
-      "meanRocAuc": 0.7955938820711207,
-      "stdRocAuc": 0.03338570774428019,
-      "meanBrier": 0.11530421493810883,
-      "meanRawAccuracy": 0.8663713724348041,
-      "meanBalancedAccuracy": 0.7252529197352029
+      "meanRocAuc": 0.7928433647489227,
+      "stdRocAuc": 0.07164152846033722,
+      "meanBrier": 0.10506698217093251,
+      "meanRawAccuracy": 0.871411410015925,
+      "meanBalancedAccuracy": 0.7321354235797721
     },
     {
       "params": {
@@ -191,50 +193,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8551016549188255,
-          "prAuc": 0.47278706872190945,
-          "brierScore": 0.13147896744728813,
-          "rawAccuracy": 0.8468744370383715,
-          "balancedAccuracy": 0.7734883358438833
+          "rocAuc": 0.8618250377073907,
+          "prAuc": 0.5033599397146159,
+          "brierScore": 0.11422317665861664,
+          "rawAccuracy": 0.8671976291905908,
+          "balancedAccuracy": 0.8084923601547642
         },
         {
           "fold": 1,
-          "rocAuc": 0.7580324302134647,
-          "prAuc": 0.2595226889588212,
-          "brierScore": 0.10808794875403989,
-          "rawAccuracy": 0.8688195991091314,
-          "balancedAccuracy": 0.6682512315270936
+          "rocAuc": 0.767488717948718,
+          "prAuc": 0.31662670848627084,
+          "brierScore": 0.0872950499907526,
+          "rawAccuracy": 0.9019277108433735,
+          "balancedAccuracy": 0.6764102564102564
         },
         {
           "fold": 2,
-          "rocAuc": 0.7867553062930057,
-          "prAuc": 0.3675008713863598,
-          "brierScore": 0.13005018287267542,
-          "rawAccuracy": 0.8418411867364747,
-          "balancedAccuracy": 0.72511960816859
+          "rocAuc": 0.8287698005698005,
+          "prAuc": 0.43332657697932453,
+          "brierScore": 0.11229686717471453,
+          "rawAccuracy": 0.8584242424242424,
+          "balancedAccuracy": 0.7492307692307693
         },
         {
           "fold": 3,
-          "rocAuc": 0.7458957821457821,
-          "prAuc": 0.152126728029463,
-          "brierScore": 0.11187767454610341,
-          "rawAccuracy": 0.8672134781644868,
-          "balancedAccuracy": 0.6992158067158067
+          "rocAuc": 0.8438895502645503,
+          "prAuc": 0.4299980845730118,
+          "brierScore": 0.12133181422747193,
+          "rawAccuracy": 0.8450704225352113,
+          "balancedAccuracy": 0.7726858465608466
         },
         {
           "fold": 4,
-          "rocAuc": 0.8005065711629479,
-          "prAuc": 0.38655240646369227,
-          "brierScore": 0.10860867971636194,
-          "rawAccuracy": 0.8868758285461776,
-          "balancedAccuracy": 0.7177239160750507
+          "rocAuc": 0.6703427419354839,
+          "prAuc": 0.09219393674628415,
+          "brierScore": 0.0991694875811052,
+          "rawAccuracy": 0.87099926704129,
+          "balancedAccuracy": 0.6294220430107527
         }
       ],
-      "meanRocAuc": 0.7892583489468051,
-      "stdRocAuc": 0.03827139628283747,
-      "meanBrier": 0.11802069066729375,
-      "meanRawAccuracy": 0.8623249059189284,
-      "meanBalancedAccuracy": 0.716759779666085
+      "meanRocAuc": 0.7944631696851887,
+      "stdRocAuc": 0.06970083918364588,
+      "meanBrier": 0.10686327912653218,
+      "meanRawAccuracy": 0.8687238544069416,
+      "meanBalancedAccuracy": 0.7272482550734778
     },
     {
       "params": {
@@ -246,50 +248,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8620721045308721,
-          "prAuc": 0.4848385924917216,
-          "brierScore": 0.1204086229494426,
-          "rawAccuracy": 0.8663303909205549,
-          "balancedAccuracy": 0.7932641878019208
+          "rocAuc": 0.8627477211620435,
+          "prAuc": 0.5146211263808949,
+          "brierScore": 0.10212967404451948,
+          "rawAccuracy": 0.8814595295425078,
+          "balancedAccuracy": 0.8050219686536821
         },
         {
           "fold": 1,
-          "rocAuc": 0.7565275041050902,
-          "prAuc": 0.2906809144571288,
-          "brierScore": 0.09742353451215156,
-          "rawAccuracy": 0.8857461024498886,
-          "balancedAccuracy": 0.6789039408866995
+          "rocAuc": 0.7461241025641026,
+          "prAuc": 0.33188465256851823,
+          "brierScore": 0.08091174684762775,
+          "rawAccuracy": 0.9093975903614457,
+          "balancedAccuracy": 0.6672820512820513
         },
         {
           "fold": 2,
-          "rocAuc": 0.7969301298048317,
-          "prAuc": 0.36448611238377304,
-          "brierScore": 0.11906304916310548,
-          "rawAccuracy": 0.8568935427574171,
-          "balancedAccuracy": 0.7450242128282855
+          "rocAuc": 0.8395002849002848,
+          "prAuc": 0.4303258700888235,
+          "brierScore": 0.09747981388945419,
+          "rawAccuracy": 0.8887272727272727,
+          "balancedAccuracy": 0.7610683760683761
         },
         {
           "fold": 3,
-          "rocAuc": 0.764000819000819,
-          "prAuc": 0.16125213542674616,
-          "brierScore": 0.10233774677170525,
-          "rawAccuracy": 0.8789625360230547,
-          "balancedAccuracy": 0.705238533988534
+          "rocAuc": 0.8381984126984128,
+          "prAuc": 0.4433869648087623,
+          "brierScore": 0.10783114339290552,
+          "rawAccuracy": 0.8677488660778229,
+          "balancedAccuracy": 0.7744788359788359
         },
         {
           "fold": 4,
-          "rocAuc": 0.8052322356744422,
-          "prAuc": 0.39927382692751634,
-          "brierScore": 0.1024516258650109,
-          "rawAccuracy": 0.895271763146266,
-          "balancedAccuracy": 0.7331244189486139
+          "rocAuc": 0.6761505376344086,
+          "prAuc": 0.09840684992555646,
+          "brierScore": 0.08960673824240026,
+          "rawAccuracy": 0.879794771561202,
+          "balancedAccuracy": 0.6444247311827958
         }
       ],
-      "meanRocAuc": 0.7969525586232111,
-      "stdRocAuc": 0.03749429554286766,
-      "meanBrier": 0.10833691585228315,
-      "meanRawAccuracy": 0.8766408670594362,
-      "meanBalancedAccuracy": 0.7311110588908107
+      "meanRocAuc": 0.7925442117918505,
+      "stdRocAuc": 0.07059748651992784,
+      "meanBrier": 0.09559182328338142,
+      "meanRawAccuracy": 0.8854256060540504,
+      "meanBalancedAccuracy": 0.7304551926331483
     },
     {
       "params": {
@@ -301,50 +303,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8585400863935854,
-          "prAuc": 0.4766117225759799,
-          "brierScore": 0.13209629918497093,
-          "rawAccuracy": 0.8582237434696451,
-          "balancedAccuracy": 0.7858155838082936
+          "rocAuc": 0.8603695324283559,
+          "prAuc": 0.493949732659321,
+          "brierScore": 0.11483105762209708,
+          "rawAccuracy": 0.867012409705501,
+          "balancedAccuracy": 0.80367171617811
         },
         {
           "fold": 1,
-          "rocAuc": 0.7490615763546797,
-          "prAuc": 0.2721449156687387,
-          "brierScore": 0.1096939734281004,
-          "rawAccuracy": 0.876391982182628,
-          "balancedAccuracy": 0.6610632183908046
+          "rocAuc": 0.7334533333333333,
+          "prAuc": 0.3199204502011358,
+          "brierScore": 0.09119023654475711,
+          "rawAccuracy": 0.9009638554216868,
+          "balancedAccuracy": 0.6478205128205128
         },
         {
           "fold": 2,
-          "rocAuc": 0.7621343202887874,
-          "prAuc": 0.3642752683003104,
-          "brierScore": 0.13038956412994068,
-          "rawAccuracy": 0.8510034904013961,
-          "balancedAccuracy": 0.7139930637454028
+          "rocAuc": 0.8346376068376069,
+          "prAuc": 0.44643566108242855,
+          "brierScore": 0.10766457158210677,
+          "rawAccuracy": 0.8746666666666667,
+          "balancedAccuracy": 0.7620085470085469
         },
         {
           "fold": 3,
-          "rocAuc": 0.756451678951679,
-          "prAuc": 0.14659178286066554,
-          "brierScore": 0.10995755377162678,
-          "rawAccuracy": 0.8822877410773664,
-          "balancedAccuracy": 0.7025522113022113
+          "rocAuc": 0.8528201058201057,
+          "prAuc": 0.44929889845006393,
+          "brierScore": 0.11751981057608661,
+          "rawAccuracy": 0.8672714251611363,
+          "balancedAccuracy": 0.774228835978836
         },
         {
           "fold": 4,
-          "rocAuc": 0.8013332488167682,
-          "prAuc": 0.39012204741502754,
-          "brierScore": 0.10853627350385135,
-          "rawAccuracy": 0.8959346000883782,
-          "balancedAccuracy": 0.7169170469912103
+          "rocAuc": 0.6682137096774193,
+          "prAuc": 0.09305481555786489,
+          "brierScore": 0.09612517463019275,
+          "rawAccuracy": 0.8780845345712192,
+          "balancedAccuracy": 0.6120416666666667
         }
       ],
-      "meanRocAuc": 0.7855041821610999,
-      "stdRocAuc": 0.040750618554502675,
-      "meanBrier": 0.11813473280369802,
-      "meanRawAccuracy": 0.8727683114438829,
-      "meanBalancedAccuracy": 0.7160682248475846
+      "meanRocAuc": 0.7898988576193642,
+      "stdRocAuc": 0.07605278115409679,
+      "meanBrier": 0.10546617019104806,
+      "meanRawAccuracy": 0.8775997783052419,
+      "meanBalancedAccuracy": 0.7199542557305344
     },
     {
       "params": {
@@ -356,50 +358,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8595784831167105,
-          "prAuc": 0.4939442761385466,
-          "brierScore": 0.09903317590500102,
-          "rawAccuracy": 0.8814627994955864,
-          "balancedAccuracy": 0.7917636071174414
+          "rocAuc": 0.8680218374975407,
+          "prAuc": 0.5254289725272996,
+          "brierScore": 0.07952367729717866,
+          "rawAccuracy": 0.9075754769401742,
+          "balancedAccuracy": 0.8078260869565217
         },
         {
           "fold": 1,
-          "rocAuc": 0.7541687192118226,
-          "prAuc": 0.2848300254672926,
-          "brierScore": 0.08785534347794005,
-          "rawAccuracy": 0.8924276169265033,
-          "balancedAccuracy": 0.6776600985221675
+          "rocAuc": 0.7415712820512821,
+          "prAuc": 0.3647181555687986,
+          "brierScore": 0.06845757951083611,
+          "rawAccuracy": 0.9168674698795181,
+          "balancedAccuracy": 0.6675128205128205
         },
         {
           "fold": 2,
-          "rocAuc": 0.775964606270972,
-          "prAuc": 0.37175571599971285,
-          "brierScore": 0.10030153777665067,
-          "rawAccuracy": 0.8754363001745201,
-          "balancedAccuracy": 0.7208914630488654
+          "rocAuc": 0.8284376068376068,
+          "prAuc": 0.45279372614772617,
+          "brierScore": 0.08054434053681528,
+          "rawAccuracy": 0.9025454545454545,
+          "balancedAccuracy": 0.7620940170940171
         },
         {
           "fold": 3,
-          "rocAuc": 0.7596969696969698,
-          "prAuc": 0.20015807934871702,
-          "brierScore": 0.08800272976150213,
-          "rawAccuracy": 0.8882731101751274,
-          "balancedAccuracy": 0.705620393120393
+          "rocAuc": 0.8240674603174603,
+          "prAuc": 0.45081427347060465,
+          "brierScore": 0.08930729606681215,
+          "rawAccuracy": 0.8875626641203151,
+          "balancedAccuracy": 0.7596488095238095
         },
         {
           "fold": 4,
-          "rocAuc": 0.8205792554090603,
-          "prAuc": 0.43078529574597435,
-          "brierScore": 0.0815351357765957,
-          "rawAccuracy": 0.9074237737516571,
-          "balancedAccuracy": 0.7615127408722109
+          "rocAuc": 0.6850497311827957,
+          "prAuc": 0.12550573308390792,
+          "brierScore": 0.07221520141700248,
+          "rawAccuracy": 0.9069142438309309,
+          "balancedAccuracy": 0.6582997311827956
         }
       ],
-      "meanRocAuc": 0.793997606741107,
-      "stdRocAuc": 0.04023803792808145,
-      "meanBrier": 0.09134558453953792,
-      "meanRawAccuracy": 0.8890047201046789,
-      "meanBalancedAccuracy": 0.7314896605362157
+      "meanRocAuc": 0.7894295835773371,
+      "stdRocAuc": 0.06645859067247893,
+      "meanBrier": 0.07800961896572894,
+      "meanRawAccuracy": 0.9042930618632786,
+      "meanBalancedAccuracy": 0.7310762930539929
     },
     {
       "params": {
@@ -411,50 +413,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8517245498577355,
-          "prAuc": 0.4785022435938984,
-          "brierScore": 0.11264145369071225,
-          "rawAccuracy": 0.8670509818050801,
-          "balancedAccuracy": 0.7841489107534589
+          "rocAuc": 0.864769820971867,
+          "prAuc": 0.5194014486962341,
+          "brierScore": 0.09398843645373692,
+          "rawAccuracy": 0.8931283571031673,
+          "balancedAccuracy": 0.8127726408289069
         },
         {
           "fold": 1,
-          "rocAuc": 0.7480919540229886,
-          "prAuc": 0.2804349925516096,
-          "brierScore": 0.0991122274277675,
-          "rawAccuracy": 0.8790645879732739,
-          "balancedAccuracy": 0.6737274220032841
+          "rocAuc": 0.7612476923076923,
+          "prAuc": 0.3430362710650823,
+          "brierScore": 0.07550104045033282,
+          "rawAccuracy": 0.9132530120481928,
+          "balancedAccuracy": 0.6674615384615386
         },
         {
           "fold": 2,
-          "rocAuc": 0.7600483965371142,
-          "prAuc": 0.3592679849182274,
-          "brierScore": 0.11425171057690377,
-          "rawAccuracy": 0.8597294938917975,
-          "balancedAccuracy": 0.7086205239755047
+          "rocAuc": 0.8367988603988604,
+          "prAuc": 0.44694125160040366,
+          "brierScore": 0.09322890577034992,
+          "rawAccuracy": 0.8882424242424243,
+          "balancedAccuracy": 0.7608119658119659
         },
         {
           "fold": 3,
-          "rocAuc": 0.7595413595413596,
-          "prAuc": 0.1678880729529203,
-          "brierScore": 0.09685922760977836,
-          "rawAccuracy": 0.8825094214143205,
-          "balancedAccuracy": 0.6982749795249795
+          "rocAuc": 0.8405006613756614,
+          "prAuc": 0.45785913631025815,
+          "brierScore": 0.0955214962797205,
+          "rawAccuracy": 0.8839818572451659,
+          "balancedAccuracy": 0.7653353174603175
         },
         {
           "fold": 4,
-          "rocAuc": 0.8153491326487491,
-          "prAuc": 0.41153990855546185,
-          "brierScore": 0.09293391031397724,
-          "rawAccuracy": 0.9030048608042421,
-          "balancedAccuracy": 0.7426629056795132
+          "rocAuc": 0.6706599462365591,
+          "prAuc": 0.11553583132017171,
+          "brierScore": 0.08333864563254131,
+          "rawAccuracy": 0.8973857806010261,
+          "balancedAccuracy": 0.6586760752688172
         }
       ],
-      "meanRocAuc": 0.7869510785215894,
-      "stdRocAuc": 0.039967813591624865,
-      "meanBrier": 0.10315970592382781,
-      "meanRawAccuracy": 0.8782718691777427,
-      "meanBalancedAccuracy": 0.7214869483873481
+      "meanRocAuc": 0.794795396258128,
+      "stdRocAuc": 0.07111222224865153,
+      "meanBrier": 0.08831570491733629,
+      "meanRawAccuracy": 0.8951982862479954,
+      "meanBalancedAccuracy": 0.7330115075663092
     },
     {
       "params": {
@@ -466,50 +468,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8533873900117159,
-          "prAuc": 0.4897536295484147,
-          "brierScore": 0.1201919013819789,
-          "rawAccuracy": 0.8616465501711403,
-          "balancedAccuracy": 0.7876240741947395
+          "rocAuc": 0.8601800118040527,
+          "prAuc": 0.5214675086035393,
+          "brierScore": 0.0979136626808206,
+          "rawAccuracy": 0.886830894610113,
+          "balancedAccuracy": 0.8031425011476162
         },
         {
           "fold": 1,
-          "rocAuc": 0.757706486042693,
-          "prAuc": 0.28089792279312714,
-          "brierScore": 0.09741386844295999,
-          "rawAccuracy": 0.8844097995545657,
-          "balancedAccuracy": 0.6701642036124795
+          "rocAuc": 0.7606953846153846,
+          "prAuc": 0.34323290775509285,
+          "brierScore": 0.07784881380363746,
+          "rawAccuracy": 0.911566265060241,
+          "balancedAccuracy": 0.6646923076923077
         },
         {
           "fold": 2,
-          "rocAuc": 0.7726707103885603,
-          "prAuc": 0.37274692744537286,
-          "brierScore": 0.11470335334742769,
-          "rawAccuracy": 0.8577661431064573,
-          "balancedAccuracy": 0.7235427895857175
+          "rocAuc": 0.8285709401709401,
+          "prAuc": 0.4384673332188353,
+          "brierScore": 0.09688167741405634,
+          "rawAccuracy": 0.8860606060606061,
+          "balancedAccuracy": 0.765940170940171
         },
         {
           "fold": 3,
-          "rocAuc": 0.7590366502866503,
-          "prAuc": 0.19364729657861313,
-          "brierScore": 0.10130055142842574,
-          "rawAccuracy": 0.8811793393925959,
-          "balancedAccuracy": 0.6975931613431613
+          "rocAuc": 0.8464060846560846,
+          "prAuc": 0.4383542556512825,
+          "brierScore": 0.10527970588274133,
+          "rawAccuracy": 0.8653616614943901,
+          "balancedAccuracy": 0.7782698412698412
         },
         {
           "fold": 4,
-          "rocAuc": 0.8204115428498986,
-          "prAuc": 0.4042444036796604,
-          "brierScore": 0.09649102929647298,
-          "rawAccuracy": 0.8921785240830755,
-          "balancedAccuracy": 0.731515963066261
+          "rocAuc": 0.6630981182795699,
+          "prAuc": 0.106885444291575,
+          "brierScore": 0.08727972119070344,
+          "rawAccuracy": 0.888101636941119,
+          "balancedAccuracy": 0.6486747311827956
         }
       ],
-      "meanRocAuc": 0.7926425559159036,
-      "stdRocAuc": 0.03797317998215146,
-      "meanBrier": 0.10602014077945307,
-      "meanRawAccuracy": 0.8754360712615668,
-      "meanBalancedAccuracy": 0.7220880383604718
+      "meanRocAuc": 0.7917901079052063,
+      "stdRocAuc": 0.07285797623346597,
+      "meanBrier": 0.09304071619439183,
+      "meanRawAccuracy": 0.8875842128332938,
+      "meanBalancedAccuracy": 0.7321439104465464
     },
     {
       "params": {
@@ -521,50 +523,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8503584401115629,
-          "prAuc": 0.4878977989324738,
-          "brierScore": 0.12100078372500617,
-          "rawAccuracy": 0.8596649252386958,
-          "balancedAccuracy": 0.7849943848002484
+          "rocAuc": 0.8659639976391894,
+          "prAuc": 0.5279705532982487,
+          "brierScore": 0.10081470265398895,
+          "rawAccuracy": 0.8810890905723282,
+          "balancedAccuracy": 0.801677487048331
         },
         {
           "fold": 1,
-          "rocAuc": 0.7600114942528736,
-          "prAuc": 0.27914328144637485,
-          "brierScore": 0.0996338097257462,
-          "rawAccuracy": 0.8806236080178174,
-          "balancedAccuracy": 0.680981116584565
+          "rocAuc": 0.7694107692307692,
+          "prAuc": 0.35028355918742565,
+          "brierScore": 0.07917200738107223,
+          "rawAccuracy": 0.9132530120481928,
+          "balancedAccuracy": 0.6674615384615386
         },
         {
           "fold": 2,
-          "rocAuc": 0.7661479520771394,
-          "prAuc": 0.3710665213042127,
-          "brierScore": 0.11765416851538614,
-          "rawAccuracy": 0.8579842931937173,
-          "balancedAccuracy": 0.7236578114398697
+          "rocAuc": 0.8302735042735042,
+          "prAuc": 0.44292529891412374,
+          "brierScore": 0.09878381173993257,
+          "rawAccuracy": 0.8843636363636364,
+          "balancedAccuracy": 0.7608547008547009
         },
         {
           "fold": 3,
-          "rocAuc": 0.7538892301392301,
-          "prAuc": 0.1935146225544678,
-          "brierScore": 0.10401951894832413,
-          "rawAccuracy": 0.8760806916426513,
-          "balancedAccuracy": 0.694979524979525
+          "rocAuc": 0.8283194444444444,
+          "prAuc": 0.42941198149437165,
+          "brierScore": 0.10616442206225905,
+          "rawAccuracy": 0.8679875865361661,
+          "balancedAccuracy": 0.7544398148148148
         },
         {
           "fold": 4,
-          "rocAuc": 0.8168651485378634,
-          "prAuc": 0.40695975816989016,
-          "brierScore": 0.09935483509753558,
-          "rawAccuracy": 0.896155545735749,
-          "balancedAccuracy": 0.7335839777721433
+          "rocAuc": 0.656986559139785,
+          "prAuc": 0.09993749910665824,
+          "brierScore": 0.09075884367385795,
+          "rawAccuracy": 0.8851698021011483,
+          "balancedAccuracy": 0.6524260752688172
         }
       ],
-      "meanRocAuc": 0.789454453023734,
-      "stdRocAuc": 0.037777262362811266,
-      "meanBrier": 0.10833262320239964,
-      "meanRawAccuracy": 0.8741018127657263,
-      "meanBalancedAccuracy": 0.7236393631152703
+      "meanRocAuc": 0.7901908549455385,
+      "stdRocAuc": 0.07345362298949858,
+      "meanBrier": 0.09513875750222214,
+      "meanRawAccuracy": 0.8863726255242943,
+      "meanBalancedAccuracy": 0.7273719232896405
     },
     {
       "params": {
@@ -576,50 +578,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8439418446729705,
-          "prAuc": 0.4891131841231152,
-          "brierScore": 0.09420482427355363,
-          "rawAccuracy": 0.8859664925238696,
-          "balancedAccuracy": 0.7878125251534118
+          "rocAuc": 0.8579457669355368,
+          "prAuc": 0.5413206249987165,
+          "brierScore": 0.074830794284463,
+          "rawAccuracy": 0.9105389887016114,
+          "balancedAccuracy": 0.7968011017115877
         },
         {
           "fold": 1,
-          "rocAuc": 0.7456375205254515,
-          "prAuc": 0.29140787669752677,
-          "brierScore": 0.08334760097086613,
-          "rawAccuracy": 0.8975501113585747,
-          "balancedAccuracy": 0.6595320197044334
+          "rocAuc": 0.7423779487179487,
+          "prAuc": 0.35740685997034405,
+          "brierScore": 0.0646394846943424,
+          "rawAccuracy": 0.9236144578313253,
+          "balancedAccuracy": 0.6692307692307693
         },
         {
           "fold": 2,
-          "rocAuc": 0.7788940236197621,
-          "prAuc": 0.36875219522040553,
-          "brierScore": 0.09275970391224259,
-          "rawAccuracy": 0.8865619546247818,
-          "balancedAccuracy": 0.7227682120362362
+          "rocAuc": 0.8180262108262109,
+          "prAuc": 0.4460302152466695,
+          "brierScore": 0.07701651333499322,
+          "rawAccuracy": 0.9069090909090909,
+          "balancedAccuracy": 0.7539316239316239
         },
         {
           "fold": 3,
-          "rocAuc": 0.7679156429156428,
-          "prAuc": 0.20460844326536165,
-          "brierScore": 0.08133456372102513,
-          "rawAccuracy": 0.9002438483706495,
-          "balancedAccuracy": 0.7073658886158887
+          "rocAuc": 0.8311593915343916,
+          "prAuc": 0.4431192163887886,
+          "brierScore": 0.0796862343616918,
+          "rawAccuracy": 0.9040343757460014,
+          "balancedAccuracy": 0.7607123015873016
         },
         {
           "fold": 4,
-          "rocAuc": 0.81319660137762,
-          "prAuc": 0.4404169434282934,
-          "brierScore": 0.076817741568125,
-          "rawAccuracy": 0.9114007954043305,
-          "balancedAccuracy": 0.7663394290906018
+          "rocAuc": 0.6706223118279571,
+          "prAuc": 0.12037883917548055,
+          "brierScore": 0.06687849441734693,
+          "rawAccuracy": 0.9147324700708527,
+          "balancedAccuracy": 0.6517970430107527
         }
       ],
-      "meanRocAuc": 0.7899171266222893,
-      "stdRocAuc": 0.0347184726234578,
-      "meanBrier": 0.08569288688916249,
-      "meanRawAccuracy": 0.8963446404564411,
-      "meanBalancedAccuracy": 0.7287636149201143
+      "meanRocAuc": 0.784026325968409,
+      "stdRocAuc": 0.06846409211206729,
+      "meanBrier": 0.07261030421856748,
+      "meanRawAccuracy": 0.9119658766517762,
+      "meanBalancedAccuracy": 0.726494567894407
     },
     {
       "params": {
@@ -631,50 +633,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8469212862704214,
-          "prAuc": 0.4835323249746282,
-          "brierScore": 0.09779031343866891,
-          "rawAccuracy": 0.8789407313997478,
-          "balancedAccuracy": 0.792013703898188
+          "rocAuc": 0.8524706538133648,
+          "prAuc": 0.5234907069903303,
+          "brierScore": 0.07787039013071799,
+          "rawAccuracy": 0.9075754769401742,
+          "balancedAccuracy": 0.78893566791265
         },
         {
           "fold": 1,
-          "rocAuc": 0.7522943349753695,
-          "prAuc": 0.27983293050877517,
-          "brierScore": 0.0885119218494314,
-          "rawAccuracy": 0.887305122494432,
-          "balancedAccuracy": 0.665291461412151
+          "rocAuc": 0.7699061538461538,
+          "prAuc": 0.3581138498651183,
+          "brierScore": 0.06507474632466809,
+          "rawAccuracy": 0.9204819277108434,
+          "balancedAccuracy": 0.6675641025641026
         },
         {
           "fold": 2,
-          "rocAuc": 0.7667036483767358,
-          "prAuc": 0.36472089805753644,
-          "brierScore": 0.09792575781481407,
-          "rawAccuracy": 0.8791448516579407,
-          "balancedAccuracy": 0.7248415173566523
+          "rocAuc": 0.817245584045584,
+          "prAuc": 0.45275586479926844,
+          "brierScore": 0.07925179534630653,
+          "rawAccuracy": 0.9066666666666666,
+          "balancedAccuracy": 0.7663675213675214
         },
         {
           "fold": 3,
-          "rocAuc": 0.7675470925470926,
-          "prAuc": 0.1963888136566058,
-          "brierScore": 0.08505624122532397,
-          "rawAccuracy": 0.8915983152294391,
-          "balancedAccuracy": 0.7029340704340704
+          "rocAuc": 0.8180310846560848,
+          "prAuc": 0.4391753567100617,
+          "brierScore": 0.08230328853374148,
+          "rawAccuracy": 0.9014084507042254,
+          "balancedAccuracy": 0.749255291005291
         },
         {
           "fold": 4,
-          "rocAuc": 0.8183785232843137,
-          "prAuc": 0.4220110894539437,
-          "brierScore": 0.0804170725050781,
-          "rawAccuracy": 0.9072028281042863,
-          "balancedAccuracy": 0.7558805041413117
+          "rocAuc": 0.6722997311827957,
+          "prAuc": 0.11702527777500368,
+          "brierScore": 0.0705820329378941,
+          "rawAccuracy": 0.91399951136086,
+          "balancedAccuracy": 0.6566733870967743
         }
       ],
-      "meanRocAuc": 0.7903689770907867,
-      "stdRocAuc": 0.03609227873383228,
-      "meanBrier": 0.08994026136666329,
-      "meanRawAccuracy": 0.8888383697771692,
-      "meanBalancedAccuracy": 0.7281922514484747
+      "meanRocAuc": 0.7859906415087966,
+      "stdRocAuc": 0.06262170119086914,
+      "meanBrier": 0.07501645065466564,
+      "meanRawAccuracy": 0.910026406676554,
+      "meanBalancedAccuracy": 0.7257591939892678
     },
     {
       "params": {
@@ -686,50 +688,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8499323492999206,
-          "prAuc": 0.5020875586947946,
-          "brierScore": 0.08691964288663591,
-          "rawAccuracy": 0.894433435417042,
-          "balancedAccuracy": 0.7907034906228081
+          "rocAuc": 0.8578677290314118,
+          "prAuc": 0.5420783370930863,
+          "brierScore": 0.06634885278207739,
+          "rawAccuracy": 0.9240600111131692,
+          "balancedAccuracy": 0.8039579644566857
         },
         {
           "fold": 1,
-          "rocAuc": 0.728113711001642,
-          "prAuc": 0.28692575368667,
-          "brierScore": 0.08008129219259187,
-          "rawAccuracy": 0.9033407572383073,
-          "balancedAccuracy": 0.6497865353037767
+          "rocAuc": 0.7312015384615385,
+          "prAuc": 0.3786388181744806,
+          "brierScore": 0.05810839881729913,
+          "rawAccuracy": 0.9342168674698795,
+          "balancedAccuracy": 0.6580256410256411
         },
         {
           "fold": 2,
-          "rocAuc": 0.783402200848541,
-          "prAuc": 0.3717108661820931,
-          "brierScore": 0.0888541705558788,
-          "rawAccuracy": 0.8887434554973822,
-          "balancedAccuracy": 0.7219237477905612
+          "rocAuc": 0.8327378917378918,
+          "prAuc": 0.4630687149064241,
+          "brierScore": 0.06901422740167343,
+          "rawAccuracy": 0.9178181818181819,
+          "balancedAccuracy": 0.765982905982906
         },
         {
           "fold": 3,
-          "rocAuc": 0.7709193284193284,
-          "prAuc": 0.21288300035479893,
-          "brierScore": 0.07730673093247083,
-          "rawAccuracy": 0.9062292174684106,
-          "balancedAccuracy": 0.7060432022932023
+          "rocAuc": 0.8307916666666666,
+          "prAuc": 0.46578442906998274,
+          "brierScore": 0.07155879420334418,
+          "rawAccuracy": 0.9154929577464789,
+          "balancedAccuracy": 0.7591507936507937
         },
         {
           "fold": 4,
-          "rocAuc": 0.8191160623732252,
-          "prAuc": 0.4434585164858499,
-          "brierScore": 0.0722713463073238,
-          "rawAccuracy": 0.9186920017675652,
-          "balancedAccuracy": 0.7673721158722109
+          "rocAuc": 0.6779932795698925,
+          "prAuc": 0.13244007516208345,
+          "brierScore": 0.05928807127588529,
+          "rawAccuracy": 0.9281700464207183,
+          "balancedAccuracy": 0.6691747311827957
         }
       ],
-      "meanRocAuc": 0.7902967303885313,
-      "stdRocAuc": 0.04165742931029846,
-      "meanBrier": 0.08108663657498025,
-      "meanRawAccuracy": 0.9022877734777415,
-      "meanBalancedAccuracy": 0.727165818376512
+      "meanRocAuc": 0.7861184210934802,
+      "stdRocAuc": 0.06931658867873669,
+      "meanBrier": 0.06486366889605588,
+      "meanRawAccuracy": 0.9239516129136855,
+      "meanBalancedAccuracy": 0.7312584072597643
     },
     {
       "params": {
@@ -741,50 +743,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8520644004001549,
-          "prAuc": 0.48520671045628566,
-          "brierScore": 0.10051024272962929,
-          "rawAccuracy": 0.8789407313997478,
-          "balancedAccuracy": 0.7809350233870833
+          "rocAuc": 0.8607328349399961,
+          "prAuc": 0.5162495023887894,
+          "brierScore": 0.08024473887985933,
+          "rawAccuracy": 0.9064641600296351,
+          "balancedAccuracy": 0.8072378516624041
         },
         {
           "fold": 1,
-          "rocAuc": 0.747293513957307,
-          "prAuc": 0.2916542354528061,
-          "brierScore": 0.08904146531342323,
-          "rawAccuracy": 0.8897550111358574,
-          "balancedAccuracy": 0.6617857142857143
+          "rocAuc": 0.7478707692307692,
+          "prAuc": 0.35676287785441885,
+          "brierScore": 0.0681700549389945,
+          "rawAccuracy": 0.9195180722891566,
+          "balancedAccuracy": 0.6595641025641026
         },
         {
           "fold": 2,
-          "rocAuc": 0.7668274060679123,
-          "prAuc": 0.3595986590764999,
-          "brierScore": 0.10073206099864287,
-          "rawAccuracy": 0.8736910994764397,
-          "balancedAccuracy": 0.7119925570668553
+          "rocAuc": 0.8360148148148148,
+          "prAuc": 0.46390088456155876,
+          "brierScore": 0.07782528895278668,
+          "rawAccuracy": 0.9095757575757576,
+          "balancedAccuracy": 0.7595299145299146
         },
         {
           "fold": 3,
-          "rocAuc": 0.7643243243243243,
-          "prAuc": 0.19662870559805035,
-          "brierScore": 0.08644482056934279,
-          "rawAccuracy": 0.8924850365772556,
-          "balancedAccuracy": 0.7033886158886158
+          "rocAuc": 0.8243961640211641,
+          "prAuc": 0.45786477790508007,
+          "brierScore": 0.08140941880763014,
+          "rawAccuracy": 0.904511816662688,
+          "balancedAccuracy": 0.750880291005291
         },
         {
           "fold": 4,
-          "rocAuc": 0.8100556224645031,
-          "prAuc": 0.4275875731329358,
-          "brierScore": 0.08138307302804067,
-          "rawAccuracy": 0.9114007954043305,
-          "balancedAccuracy": 0.7690981026031102
+          "rocAuc": 0.6623534946236559,
+          "prAuc": 0.11931782420740783,
+          "brierScore": 0.07150230064008616,
+          "rawAccuracy": 0.9135108722208649,
+          "balancedAccuracy": 0.6616747311827957
         }
       ],
-      "meanRocAuc": 0.7881130534428402,
-      "stdRocAuc": 0.03809584841942802,
-      "meanBrier": 0.09162233252781576,
-      "meanRawAccuracy": 0.8892545347987262,
-      "meanBalancedAccuracy": 0.7254400026462757
+      "meanRocAuc": 0.7862736155260801,
+      "stdRocAuc": 0.07252953320437687,
+      "meanBrier": 0.07583036044387136,
+      "meanRawAccuracy": 0.9107161357556205,
+      "meanBalancedAccuracy": 0.7277773781889016
     },
     {
       "params": {
@@ -796,50 +798,50 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.8407359425167084,
-          "prAuc": 0.48041230037174026,
-          "brierScore": 0.06666694439090895,
-          "rawAccuracy": 0.9149702756260133,
-          "balancedAccuracy": 0.7588223795415084
+          "rocAuc": 0.8543101186963078,
+          "prAuc": 0.516811178955556,
+          "brierScore": 0.049416532554512865,
+          "rawAccuracy": 0.9433228375625116,
+          "balancedAccuracy": 0.7810958095612828
         },
         {
           "fold": 1,
-          "rocAuc": 0.7471748768472907,
-          "prAuc": 0.3055684892191462,
-          "brierScore": 0.0685715650623664,
-          "rawAccuracy": 0.9175946547884187,
-          "balancedAccuracy": 0.6558004926108374
+          "rocAuc": 0.7256005128205127,
+          "prAuc": 0.35901378306254417,
+          "brierScore": 0.05129655588973281,
+          "rawAccuracy": 0.9416867469879519,
+          "balancedAccuracy": 0.6507692307692308
         },
         {
           "fold": 2,
-          "rocAuc": 0.7739941896977303,
-          "prAuc": 0.3671299532879524,
-          "brierScore": 0.06689674973261323,
-          "rawAccuracy": 0.918630017452007,
-          "balancedAccuracy": 0.7157402311502477
+          "rocAuc": 0.8255179487179487,
+          "prAuc": 0.47942946686997223,
+          "brierScore": 0.051655533998053824,
+          "rawAccuracy": 0.9415757575757576,
+          "balancedAccuracy": 0.7617948717948718
         },
         {
           "fold": 3,
-          "rocAuc": 0.7708128583128583,
-          "prAuc": 0.24587359888146745,
-          "brierScore": 0.05586511742513842,
-          "rawAccuracy": 0.9299490135225006,
-          "balancedAccuracy": 0.7006388206388207
+          "rocAuc": 0.8068935185185184,
+          "prAuc": 0.4571635970372099,
+          "brierScore": 0.05268634682643411,
+          "rawAccuracy": 0.9384101217474338,
+          "balancedAccuracy": 0.7434252645502646
         },
         {
           "fold": 4,
-          "rocAuc": 0.819055316091954,
-          "prAuc": 0.47919637260631576,
-          "brierScore": 0.0521389588020644,
-          "rawAccuracy": 0.9401237295625277,
-          "balancedAccuracy": 0.7729990703177823
+          "rocAuc": 0.6790443548387097,
+          "prAuc": 0.13969583673161073,
+          "brierScore": 0.044079433616009724,
+          "rawAccuracy": 0.9489372098705107,
+          "balancedAccuracy": 0.6430403225806451
         }
       ],
-      "meanRocAuc": 0.7903546366933083,
-      "stdRocAuc": 0.03428131258554815,
-      "meanBrier": 0.062027867082618295,
-      "meanRawAccuracy": 0.9242535381902934,
-      "meanBalancedAccuracy": 0.7208001988518393
+      "meanRocAuc": 0.7782732907183995,
+      "stdRocAuc": 0.06550355349912367,
+      "meanBrier": 0.04982688057694866,
+      "meanRawAccuracy": 0.942786534748833,
+      "meanBalancedAccuracy": 0.716025099851259
     },
     {
       "params": {
@@ -851,106 +853,106 @@
       "folds": [
         {
           "fold": 0,
-          "rocAuc": 0.841875272295665,
-          "prAuc": 0.4929831411342441,
-          "brierScore": 0.07921661831382538,
-          "rawAccuracy": 0.902179787425689,
-          "balancedAccuracy": 0.7837177094073441
+          "rocAuc": 0.8525663977965768,
+          "prAuc": 0.5275833165835027,
+          "brierScore": 0.056724036037131546,
+          "rawAccuracy": 0.9338766438229301,
+          "balancedAccuracy": 0.802857236540101
         },
         {
           "fold": 1,
-          "rocAuc": 0.7358440065681445,
-          "prAuc": 0.29871476387547086,
-          "brierScore": 0.07661298636614307,
-          "rawAccuracy": 0.9060133630289532,
-          "balancedAccuracy": 0.6624507389162562
+          "rocAuc": 0.7596302564102564,
+          "prAuc": 0.3775168078260356,
+          "brierScore": 0.055078102352309206,
+          "rawAccuracy": 0.9366265060240964,
+          "balancedAccuracy": 0.6536923076923077
         },
         {
           "fold": 2,
-          "rocAuc": 0.7491169524741348,
-          "prAuc": 0.35641289047120345,
-          "brierScore": 0.08115972082618868,
-          "rawAccuracy": 0.8972513089005235,
-          "balancedAccuracy": 0.7064627722305212
+          "rocAuc": 0.8233025641025642,
+          "prAuc": 0.4591016114488927,
+          "brierScore": 0.06091488169595481,
+          "rawAccuracy": 0.927030303030303,
+          "balancedAccuracy": 0.7541025641025642
         },
         {
           "fold": 3,
-          "rocAuc": 0.764445126945127,
-          "prAuc": 0.22479396211766503,
-          "brierScore": 0.06822136129021086,
-          "rawAccuracy": 0.9126579472400798,
-          "balancedAccuracy": 0.6961660524160524
+          "rocAuc": 0.809704365079365,
+          "prAuc": 0.46244567765134725,
+          "brierScore": 0.05805629356536239,
+          "rawAccuracy": 0.9305323466221055,
+          "balancedAccuracy": 0.7519027777777778
         },
         {
           "fold": 4,
-          "rocAuc": 0.8143415367224476,
-          "prAuc": 0.4626755291767169,
-          "brierScore": 0.061327739202808214,
-          "rawAccuracy": 0.9284136102518781,
-          "balancedAccuracy": 0.7724272629310345
+          "rocAuc": 0.6644502688172043,
+          "prAuc": 0.13756039127694192,
+          "brierScore": 0.05156313697841325,
+          "rawAccuracy": 0.9401417053505986,
+          "balancedAccuracy": 0.6700483870967742
         }
       ],
-      "meanRocAuc": 0.7811245790011039,
-      "stdRocAuc": 0.04036591515787895,
-      "meanBrier": 0.07330768519983524,
-      "meanRawAccuracy": 0.9093032033694248,
-      "meanBalancedAccuracy": 0.7242449071802417
+      "meanRocAuc": 0.7819307704411933,
+      "stdRocAuc": 0.06598692432541653,
+      "meanBrier": 0.05646729012583425,
+      "meanRawAccuracy": 0.9336415009700068,
+      "meanBalancedAccuracy": 0.7265206546419051
     }
   ],
   "best": {
     "params": {
       "n_estimators": 100,
       "num_leaves": 31,
-      "learning_rate": 0.05,
-      "max_depth": -1
+      "learning_rate": 0.1,
+      "max_depth": 6
     },
     "folds": [
       {
         "fold": 0,
-        "rocAuc": 0.8620721045308721,
-        "prAuc": 0.4848385924917216,
-        "brierScore": 0.1204086229494426,
-        "rawAccuracy": 0.8663303909205549,
-        "balancedAccuracy": 0.7932641878019208
+        "rocAuc": 0.864769820971867,
+        "prAuc": 0.5194014486962341,
+        "brierScore": 0.09398843645373692,
+        "rawAccuracy": 0.8931283571031673,
+        "balancedAccuracy": 0.8127726408289069
       },
       {
         "fold": 1,
-        "rocAuc": 0.7565275041050902,
-        "prAuc": 0.2906809144571288,
-        "brierScore": 0.09742353451215156,
-        "rawAccuracy": 0.8857461024498886,
-        "balancedAccuracy": 0.6789039408866995
+        "rocAuc": 0.7612476923076923,
+        "prAuc": 0.3430362710650823,
+        "brierScore": 0.07550104045033282,
+        "rawAccuracy": 0.9132530120481928,
+        "balancedAccuracy": 0.6674615384615386
       },
       {
         "fold": 2,
-        "rocAuc": 0.7969301298048317,
-        "prAuc": 0.36448611238377304,
-        "brierScore": 0.11906304916310548,
-        "rawAccuracy": 0.8568935427574171,
-        "balancedAccuracy": 0.7450242128282855
+        "rocAuc": 0.8367988603988604,
+        "prAuc": 0.44694125160040366,
+        "brierScore": 0.09322890577034992,
+        "rawAccuracy": 0.8882424242424243,
+        "balancedAccuracy": 0.7608119658119659
       },
       {
         "fold": 3,
-        "rocAuc": 0.764000819000819,
-        "prAuc": 0.16125213542674616,
-        "brierScore": 0.10233774677170525,
-        "rawAccuracy": 0.8789625360230547,
-        "balancedAccuracy": 0.705238533988534
+        "rocAuc": 0.8405006613756614,
+        "prAuc": 0.45785913631025815,
+        "brierScore": 0.0955214962797205,
+        "rawAccuracy": 0.8839818572451659,
+        "balancedAccuracy": 0.7653353174603175
       },
       {
         "fold": 4,
-        "rocAuc": 0.8052322356744422,
-        "prAuc": 0.39927382692751634,
-        "brierScore": 0.1024516258650109,
-        "rawAccuracy": 0.895271763146266,
-        "balancedAccuracy": 0.7331244189486139
+        "rocAuc": 0.6706599462365591,
+        "prAuc": 0.11553583132017171,
+        "brierScore": 0.08333864563254131,
+        "rawAccuracy": 0.8973857806010261,
+        "balancedAccuracy": 0.6586760752688172
       }
     ],
-    "meanRocAuc": 0.7969525586232111,
-    "stdRocAuc": 0.03749429554286766,
-    "meanBrier": 0.10833691585228315,
-    "meanRawAccuracy": 0.8766408670594362,
-    "meanBalancedAccuracy": 0.7311110588908107
+    "meanRocAuc": 0.794795396258128,
+    "stdRocAuc": 0.07111222224865153,
+    "meanBrier": 0.08831570491733629,
+    "meanRawAccuracy": 0.8951982862479954,
+    "meanBalancedAccuracy": 0.7330115075663092
   },
   "isSynthetic": false
 }

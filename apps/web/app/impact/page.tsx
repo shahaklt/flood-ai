@@ -239,21 +239,21 @@ export default async function ImpactPage() {
               <p className="text-sm font-medium text-ink">Scaled up: statewide real training data</p>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                 The pipeline pulls real Global Flood Database events against the entire real New York State
-                boundary — 24 real historical events across 86 tiles, 23,662 usable real event-cell rows, 1,110
-                real positive flood observations. Best real result: a real ensemble (logistic regression +
-                gradient-boosted trees + LightGBM), isotonic-calibrated —{" "}
-                <span className="font-mono text-ink">0.821 ROC-AUC</span> and{" "}
-                <span className="font-mono text-ink">73.8% balanced accuracy</span>, the best of every experiment
-                run.
+                boundary — 24 real historical events across 87 tiles, 21,956 usable real event-cell rows, 1,056
+                real positive flood observations, all 8 real factors including terrain curvature. Best real
+                result: a real ensemble (logistic regression + gradient-boosted trees + LightGBM),
+                isotonic-calibrated —{" "}
+                <span className="font-mono text-ink">0.813 ROC-AUC</span> and{" "}
+                <span className="font-mono text-ink">73.9% balanced accuracy</span>.
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                The honest catch, caught and reported rather than hidden: at this dataset&apos;s 4.7% positive rate,
-                an <em>unweighted</em> model reports 95.8% raw accuracy — which sounds better, but is barely above
-                the 95.3% you&apos;d get by always guessing &quot;no flood.&quot; Its balanced accuracy is only
-                58.3%, barely above a coin flip. Worse: even the well-calibrated ensemble&apos;s balanced accuracy
-                collapses to 59.5% at the default 0.5 cutoff, because real calibration correctly keeps most
-                probabilities below 0.5 at this base rate — the fix isn&apos;t a better model, it&apos;s the right
-                decision threshold. Try it yourself below; every point on this curve is a real, precomputed
+                The honest catch, caught and reported rather than hidden: at this dataset&apos;s ~4.8% positive
+                rate, an <em>unweighted</em> model reports 95.8% raw accuracy — which sounds better, but is barely
+                above the 95.3% you&apos;d get by always guessing &quot;no flood.&quot; Its balanced accuracy is
+                only 58.3%, barely above a coin flip. Worse: even the well-calibrated ensemble&apos;s balanced
+                accuracy collapses to ~60% at the default 0.5 cutoff, because real calibration correctly keeps
+                most probabilities below 0.5 at this base rate — the fix isn&apos;t a better model, it&apos;s the
+                right decision threshold. Try it yourself below; every point on this curve is a real, precomputed
                 out-of-fold operating point, not an estimate.
               </p>
               {ensembleEval && (
@@ -262,11 +262,14 @@ export default async function ImpactPage() {
                 </div>
               )}
               <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-                That threshold itself was picked honestly too: an earlier version chose it by scanning the same
-                out-of-fold data it was then scored on — a real form of leakage that inflated the number to
-                74.7%. Fixed with nested cross-validated selection (each fold&apos;s threshold chosen only from the
-                other four), which is where the more conservative 73.8% above comes from. Full numbers and the
-                fix itself: <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> and{" "}
+                Two honest findings behind this number, both caught and fixed rather than hidden: (1) the
+                threshold itself was originally picked by scanning the same out-of-fold data it was scored on —
+                real leakage, fixed with nested cross-validated selection (each fold&apos;s threshold chosen only
+                from the other four); (2) adding curvature and re-fetching the statewide dataset was tested
+                directly against the prior 8-factor run and found to be a statistical wash (0.821→0.813 ROC-AUC,
+                73.8%→73.9% balanced accuracy — noise, not a real gain), reported as current only because it uses
+                the most complete real feature set. Full numbers and both fixes:{" "}
+                <code className="rounded bg-surface-2 px-1 py-0.5">docs/EVALUATION.md</code> and{" "}
                 <Link href="/model" className="text-accent underline">/model</Link>. Still experimental — not what
                 generates the map&apos;s scores.
               </p>

@@ -192,14 +192,13 @@ export default function ModelView({ ensemble, lightgbm }: { ensemble: EnsembleEv
         <section>
           <h2 className="text-sm font-medium uppercase tracking-wide text-ink-muted">Fixing a real leak: picking the threshold honestly</h2>
           <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-            The first version of this page picked the threshold that maximized balanced accuracy on the same
-            out-of-fold data that number was then reported on — real out-of-fold probabilities, but an
-            optimistic selection, since the cutoff was tuned to the exact labels it was scored against. Fixed
-            with nested selection: each fold&apos;s threshold is chosen using only the <em>other</em> four folds,
-            then applied to the held-out one. The honest number is a little lower —{" "}
-            <span className="font-mono text-ink">73.8%</span> instead of{" "}
-            <span className="font-mono text-ink-muted line-through">74.7%</span> — and three plausible
-            selection objectives were tested, not assumed:
+            An earlier version of this evaluation picked the threshold that maximized balanced accuracy on the
+            same out-of-fold data that number was then reported on — real out-of-fold probabilities, but an
+            optimistic selection, since the cutoff was tuned to the exact labels it was scored against (that
+            version reported 74.7%; the honest number below is a little lower). Fixed with nested selection: each
+            fold&apos;s threshold is chosen using only the <em>other</em> four folds, then applied to the held-out
+            one — every prediction below still comes from a threshold that never saw its own label. Three
+            plausible selection objectives were tested this way, not assumed:
           </p>
           <div className="mt-3 overflow-x-auto border border-border">
             <table className="w-full text-sm">

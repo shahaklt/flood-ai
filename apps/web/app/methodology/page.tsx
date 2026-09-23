@@ -29,7 +29,7 @@ export default function MethodologyPage() {
           index, terrain curvature, water proximity, FEMA flood zone membership, and impervious surface. One
           conceptually useful factor — soil infiltration (hydrologic soil group) — is not yet wired up; every
           score&apos;s confidence is reduced to reflect that gap rather than hiding it. A separate experimental
-          statistical model, evaluated on 24 real historical flood events statewide, reaches 0.821 ROC-AUC / 73.8%
+          statistical model, evaluated on 24 real historical flood events statewide, reaches 0.813 ROC-AUC / 73.9%
           honest (nested-cross-validated) balanced accuracy (see{" "}
           <a href="/model" className="text-accent underline">/model</a>) but is not yet used to generate the
           scores shown on the map.
