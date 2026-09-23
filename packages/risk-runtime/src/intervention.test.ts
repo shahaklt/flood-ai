@@ -16,6 +16,7 @@ const cell = (overrides: Partial<RiskFeatures> = {}): RiskFeatures => ({
   distanceToWaterM: 20,
   distanceToRoadM: null,
   femaSfha: true,
+  hydrologicSoilGroup: "C",
   relativeElevationZ: -1.5,
   ...overrides,
 });

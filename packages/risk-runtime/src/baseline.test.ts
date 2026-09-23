@@ -16,6 +16,7 @@ const baseFeatures: RiskFeatures = {
   distanceToWaterM: 50,
   distanceToRoadM: 20,
   femaSfha: true,
+  hydrologicSoilGroup: "C",
   relativeElevationZ: -1.5,
 };
 
@@ -89,9 +90,23 @@ describe("computeBaselineRisk", () => {
     expect(r.dataCompleteness.missing).toContain("topographicWetnessIndex");
   });
 
-  it("always reports the structurally-missing soil infiltration factor", () => {
+  it("reports no structurally-missing factors now that soil infiltration is wired up", () => {
     const r = computeBaselineRisk(baseFeatures, opts);
-    expect(r.dataCompleteness.missing).toEqual(expect.arrayContaining(["soilInfiltration"]));
+    expect(r.dataCompleteness.missing).not.toContain("soilInfiltration");
+    expect(r.dataCompleteness.present).toContain("soilInfiltration");
+  });
+
+  it("worse (more runoff-prone) hydrologic soil group cannot decrease risk score", () => {
+    const wellDrained = computeBaselineRisk({ ...baseFeatures, hydrologicSoilGroup: "A" }, opts);
+    const poorlyDrained = computeBaselineRisk({ ...baseFeatures, hydrologicSoilGroup: "D" }, opts);
+    expect(poorlyDrained.riskScore).toBeGreaterThanOrEqual(wellDrained.riskScore);
+  });
+
+  it("reduces confidence rather than fabricating when soil data is unavailable", () => {
+    const full = computeBaselineRisk(baseFeatures, opts);
+    const missingSoil = computeBaselineRisk({ ...baseFeatures, hydrologicSoilGroup: null }, opts);
+    expect(missingSoil.confidenceScore).toBeLessThan(full.confidenceScore);
+    expect(missingSoil.dataCompleteness.missing).toContain("soilInfiltration");
   });
 
   it("assigns category thresholds consistently with the score", () => {

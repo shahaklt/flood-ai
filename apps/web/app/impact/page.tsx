@@ -193,11 +193,11 @@ export default async function ImpactPage() {
               <p className="text-sm font-medium text-ink">Shipped model: deterministic baseline ({BASELINE_WEIGHTS_VERSION})</p>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                 This is not a statistical model, so it has no ROC-AUC/accuracy figure — it&apos;s a documented,
-                versioned formula over eight real, live-fetched features (elevation, slope, flow accumulation,
-                topographic wetness, curvature, water proximity, FEMA zone, impervious surface), unit-tested for
-                correctness properties: scores always stay within 0-100, a worse input can never lower a score,
-                and missing real data reduces confidence instead of silently becoming a fabricated zero-risk
-                reading.
+                versioned formula over nine real, live-fetched features (elevation, slope, flow accumulation,
+                topographic wetness, curvature, water proximity, FEMA zone, impervious surface, and hydrologic
+                soil group), unit-tested for correctness properties: scores always stay within 0-100, a worse
+                input can never lower a score, and missing real data reduces confidence instead of silently
+                becoming a fabricated zero-risk reading.
               </p>
             </div>
 

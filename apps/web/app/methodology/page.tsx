@@ -25,12 +25,13 @@ export default function MethodologyPage() {
           ), computed live for any location in New York State from real public data (see{" "}
           <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-xs">data/metadata/sources.json</code>
           ). Every risk score is a <strong className="text-ink">relative risk index</strong>, not a calibrated
-          probability, built from eight real factors: elevation, slope, flow accumulation, topographic wetness
-          index, terrain curvature, water proximity, FEMA flood zone membership, and impervious surface. One
-          conceptually useful factor — soil infiltration (hydrologic soil group) — is not yet wired up; every
-          score&apos;s confidence is reduced to reflect that gap rather than hiding it. A separate experimental
-          statistical model, evaluated on 24 real historical flood events statewide, reaches 0.813 ROC-AUC / 73.9%
-          honest (nested-cross-validated) balanced accuracy (see{" "}
+          probability, built from nine real factors: elevation, slope, flow accumulation, topographic wetness
+          index, terrain curvature, water proximity, FEMA flood zone membership, impervious surface, and
+          hydrologic soil group (USDA NRCS Soil Data Access) — every conceptually useful factor from the original
+          spec is now wired to a real data source. Soil data is still resolved at tile-centroid granularity and
+          genuinely missing for some dense urban mapunits; confidence drops for those cells rather than guessing.
+          A separate experimental statistical model, evaluated on 24 real historical flood events statewide,
+          reaches 0.813 ROC-AUC / 73.9% honest (nested-cross-validated) balanced accuracy (see{" "}
           <a href="/model" className="text-accent underline">/model</a>) but is not yet used to generate the
           scores shown on the map.
         </p>

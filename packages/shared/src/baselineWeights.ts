@@ -3,6 +3,22 @@
  * through code, so it can be reviewed, sensitivity-tested, and cited in
  * docs/METHODOLOGY.md.
  *
+ * v0.5.0 rationale:
+ * - Added soil infiltration (USDA NRCS hydrologic soil group, via
+ *   services/risk/adapters/soil.py's real USDA Soil Data Access query) --
+ *   this closes the last structurally-missing conceptual factor from
+ *   v0.1.0-v0.4.0. Group A (well-drained sand/gravel) infiltrates rain
+ *   quickly and generates little runoff; group D (clay, shallow bedrock,
+ *   high water table) sheds nearly all of it -- a real, independent
+ *   physical driver of pluvial flooding that elevation/slope/land-cover
+ *   don't capture on their own. Resolved at tile-centroid granularity
+ *   (soil surveys are coarser than the ~100 m analysis grid; documented,
+ *   not hidden), and missing for urban/built-up mapunits where USDA has no
+ *   classification -- confidence drops for those cells rather than
+ *   guessing a value.
+ * - All other weights proportionally reduced to make room; no factor's
+ *   relative importance to the others changed.
+ *
  * v0.4.0 rationale:
  * - Added curvature (discrete Laplacian of elevation): concave terrain
  *   (a local bowl) collects water even without much upslope contributing
@@ -34,17 +50,18 @@
  *   v0.1.0 and raises the confidence ceiling accordingly (see
  *   risk-runtime/baseline.ts AVAILABLE_CONCEPTUAL_FACTOR_COUNT).
  */
-export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.4.0";
+export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.5.0";
 
 export const BASELINE_WEIGHTS = {
-  lowElevation: 0.16,
-  lowSlope: 0.07,
-  flowAccumulation: 0.13,
-  topographicWetnessIndex: 0.11,
-  curvature: 0.08,
-  waterProximity: 0.17,
-  femaZone: 0.15,
-  impervious: 0.13,
+  lowElevation: 0.15,
+  lowSlope: 0.06,
+  flowAccumulation: 0.12,
+  topographicWetnessIndex: 0.1,
+  curvature: 0.07,
+  waterProximity: 0.15,
+  femaZone: 0.14,
+  impervious: 0.12,
+  soilInfiltration: 0.09,
 } as const;
 
 export type BaselineFactorKey = keyof typeof BASELINE_WEIGHTS;

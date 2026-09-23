@@ -9,7 +9,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_DIR = REPO_ROOT / "data" / "cache" / "tiles"
-DATA_VERSION = "risk-tiles-v1-nystate"
+DATA_VERSION = "risk-tiles-v2-nystate-soil"  # bumped: hydrologicSoilGroup added; old cache entries lack it
 
 
 def cache_path(z: int, x: int, y: int) -> Path:

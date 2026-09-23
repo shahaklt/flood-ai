@@ -6,16 +6,18 @@ import {
   RAINFALL_REFERENCE_INCHES,
   type BaselineFactorKey,
   type FactorContribution,
+  type HydrologicSoilGroup,
   type RiskCategory,
   type RiskFeatures,
   type RiskResult,
 } from "@flood-ai/shared";
 
-/** Conceptual factor from spec section 6.3 that this pipeline does not yet
- * compute from real data (no wired-up hydrologic-soil-group source).
- * Counted against confidence, never faked. */
-const STRUCTURALLY_MISSING_FACTORS = ["soilInfiltration"] as const;
-const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 8; // elevation, slope, flowAccumulation, TWI, curvature, water, fema, impervious
+/** All spec section 6.3 conceptual factors are now wired to real data as of
+ * v0.5.0 (hydrologic soil group closed the last structural gap) -- kept as
+ * an empty list rather than deleted so a future genuinely-missing factor
+ * has an obvious place to go. */
+const STRUCTURALLY_MISSING_FACTORS: readonly string[] = [];
+const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 9; // elevation, slope, flowAccumulation, TWI, curvature, water, fema, impervious, soilInfiltration
 const TOTAL_CONCEPTUAL_FACTOR_COUNT =
   AVAILABLE_CONCEPTUAL_FACTOR_COUNT + STRUCTURALLY_MISSING_FACTORS.length;
 
@@ -88,6 +90,23 @@ function femaFactor(sfha: boolean): number {
   return sfha ? 1 : 0;
 }
 
+/** Real USDA runoff-potential ordering: A (well-drained sand/gravel, low
+ * runoff) through D (clay/shallow bedrock/high water table, high runoff).
+ * Linearly spaced across the four real classes -- there's no finer real
+ * gradation published (SSURGO reports the letter class, not a continuous
+ * infiltration rate). */
+const HYDROLOGIC_SOIL_GROUP_FACTOR: Record<HydrologicSoilGroup, number> = {
+  A: 0,
+  B: 1 / 3,
+  C: 2 / 3,
+  D: 1,
+};
+
+function soilInfiltrationFactor(group: HydrologicSoilGroup | null): number | null {
+  if (group == null) return null;
+  return HYDROLOGIC_SOIL_GROUP_FACTOR[group];
+}
+
 function rainfallAmplification(totalInches: number): number {
   const ratio = clamp01(totalInches / RAINFALL_REFERENCE_INCHES);
   return ratio * RAINFALL_MAX_AMPLIFICATION;
@@ -148,6 +167,7 @@ export function computeBaselineRisk(features: RiskFeatures, options: BaselineOpt
       const f = imperviousFactor(features.imperviousPct);
       return f === null ? null : clamp01(f * (1 + amplification));
     })(),
+    soilInfiltration: soilInfiltrationFactor(features.hydrologicSoilGroup),
   };
 
   const presentKeys = (Object.keys(factorValues) as BaselineFactorKey[]).filter(
@@ -236,6 +256,10 @@ function factorLabel(key: BaselineFactorKey, features: RiskFeatures): string {
       return features.imperviousPct != null
         ? `${features.imperviousPct}% estimated impervious surface`
         : "Impervious surface coverage";
+    case "soilInfiltration":
+      return features.hydrologicSoilGroup != null
+        ? `Hydrologic soil group ${features.hydrologicSoilGroup} (USDA)`
+        : "Soil infiltration potential";
   }
 }
 
@@ -257,5 +281,7 @@ function rawValueFor(key: BaselineFactorKey, features: RiskFeatures): number | s
       return features.femaSfha;
     case "impervious":
       return features.imperviousPct;
+    case "soilInfiltration":
+      return features.hydrologicSoilGroup;
   }
 }

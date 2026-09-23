@@ -1,23 +1,21 @@
 # Model Card
 
-## FloodAI deterministic baseline (`baseline-weights-v0.1.0`) — shipped model
+## FloodAI deterministic baseline (`baseline-weights-v0.5.0`) — shipped model
 
-**Purpose**: Produce an explainable 0-100 relative risk index for a 250 m analysis cell in the pilot AOI (Village of Mamaroneck, NY), from real public environmental data, when statistical training data is insufficient for a defensible calibrated model.
+**Purpose**: Produce an explainable 0-100 relative risk index for any ~100 m analysis cell in New York State, computed live from real public environmental data, when statistical training data is insufficient for a defensible calibrated model.
 
-**Inputs**: relative elevation (z-score vs. AOI distribution), slope, distance to mapped surface water, FEMA Special Flood Hazard Area membership, impervious surface percentage. All from real sources — see `data/metadata/sources.json`.
-
-**Not used (structural gap, disclosed)**: flow accumulation, hydrologic soil group. Confidence is capped to reflect this rather than fabricating these factors.
+**Inputs (9 real factors, all live-fetched per tile)**: relative elevation (z-score), slope, flow accumulation (real D8 algorithm on the fetched DEM), topographic wetness index, terrain curvature, distance to mapped surface water (OSM + USGS NHD), FEMA Special Flood Hazard Area membership, impervious surface percentage, and hydrologic soil group (USDA NRCS, via Soil Data Access). All from real sources — see `data/metadata/sources.json`.
 
 **Output**: `riskScore` (0-100, `relative_risk_index`, not a calibrated probability), `riskCategory`, `confidenceScore`, ordered `topContributors`, `dataCompleteness`.
 
 **Evaluation**: Unit-tested for correctness properties (determinism, bounds, monotonicity, missing-data handling) — see `docs/EVALUATION.md`. Not evaluated against flood observation labels because it is not a statistical model; it should not be described as one.
 
 **Known limitations**:
-- Only covers the Mamaroneck, NY pilot AOI.
-- Two conceptually useful factors are missing from the current pipeline (see above).
-- Weights are hand-set with documented rationale, not fit to data — they have not yet been reviewed/adjusted by the student (see `docs/STUDENT_CHECKPOINTS.md`).
+- Weights are hand-set with documented rationale (see `packages/shared/src/baselineWeights.ts`), not fit to data.
+- Soil data is resolved at tile-centroid granularity (survey polygons are coarser than the analysis grid) and is genuinely missing for many dense urban mapunits — confidence drops for those cells rather than guessing.
+- Any individual real data source (DEM, NLCD, FEMA, water, soil) can be transiently unavailable for a given tile; the pipeline degrades that cell's confidence rather than fabricating a value.
 
-**Prohibited uses**: Emergency response, evacuation guidance, insurance/property valuation, engineering certification, or any claim of prediction outside the pilot AOI.
+**Prohibited uses**: Emergency response, evacuation guidance, insurance/property valuation, engineering certification, or any claim of prediction outside New York State.
 
 ---
 

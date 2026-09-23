@@ -14,6 +14,11 @@ export type ScoreMeaning = "calibrated_probability" | "relative_risk_index";
 
 export type RiskCategory = "minimal" | "low" | "moderate" | "high" | "very_high";
 
+/** USDA NRCS hydrologic soil group -- A (well-drained, low runoff) through
+ * D (poorly drained, high runoff). Real classification, tile-centroid
+ * resolution (see services/risk/adapters/soil.py). */
+export type HydrologicSoilGroup = "A" | "B" | "C" | "D";
+
 /** Real, per-cell environmental inputs. `null` means the value is genuinely
  * unavailable for this cell — never coerced to a fabricated default. */
 export interface RiskFeatures {
@@ -30,6 +35,7 @@ export interface RiskFeatures {
   distanceToWaterM: number | null;
   distanceToRoadM: number | null;
   femaSfha: boolean;
+  hydrologicSoilGroup: HydrologicSoilGroup | null;
   relativeElevationZ: number | null;
 }
 

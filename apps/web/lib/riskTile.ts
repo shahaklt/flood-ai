@@ -1,4 +1,4 @@
-import type { RiskFeatures } from "@flood-ai/shared";
+import type { HydrologicSoilGroup, RiskFeatures } from "@flood-ai/shared";
 
 /** Shared shape of a raw feature cell as served by services/risk's live
  * per-tile endpoint (apps/web/app/api/risk-tiles/[z]/[x]/[y]/route.ts),
@@ -16,6 +16,7 @@ export interface RawTileCell {
   imperviousPct: number | null;
   distanceToWaterM: number | null;
   femaSfha: boolean;
+  hydrologicSoilGroup: HydrologicSoilGroup | null;
   relativeElevationZ: number | null;
   coverageTier: RiskFeatures["coverageTier"];
 }
@@ -44,6 +45,7 @@ export function rawCellToFeatures(cell: RawTileCell): RiskFeatures {
     distanceToWaterM: cell.distanceToWaterM,
     distanceToRoadM: null,
     femaSfha: cell.femaSfha,
+    hydrologicSoilGroup: cell.hydrologicSoilGroup,
     relativeElevationZ: cell.relativeElevationZ,
   };
 }

@@ -11,7 +11,7 @@ import numpy as np
 from shapely.geometry import Point, box
 from shapely.ops import unary_union
 
-from .adapters import coverage, dem, fema, nhd, nlcd, osm_water
+from .adapters import coverage, dem, fema, nhd, nlcd, osm_water, soil
 from .hydrology import compute_curvature, compute_flow_accumulation
 from .tiles import tile_to_bbox
 
@@ -53,13 +53,14 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
     # down to roughly the slowest single call (~5-10s), since network I/O
     # dominates, not CPU. Each failure degrades that one source gracefully
     # (missing feature, lower confidence) rather than failing the whole tile.
-    with ThreadPoolExecutor(max_workers=5) as pool:
+    with ThreadPoolExecutor(max_workers=6) as pool:
         dem_future = pool.submit(dem.fetch_dem, bbox)
         lc_future = pool.submit(nlcd.fetch_land_cover, bbox)
         imp_future = pool.submit(nlcd.fetch_impervious, bbox)
         fema_future = pool.submit(fema.fetch_fema_sfha_union, bbox)
         water_future = pool.submit(osm_water.fetch_water_union, bbox)
         nhd_future = pool.submit(nhd.fetch_nhd_flowlines_union, bbox)
+        soil_future = pool.submit(soil.fetch_hydrologic_soil_group, bbox)
 
         try:
             dem_arr, dem_transform = dem_future.result()
@@ -78,6 +79,12 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
         except Exception as exc:
             fema_sfha = None
             warnings.append(f"FEMA NFHL unavailable for this tile: {exc}")
+
+        try:
+            hydrologic_soil_group = soil_future.result()
+        except Exception as exc:
+            hydrologic_soil_group = None
+            warnings.append(f"USDA Soil Data Access unavailable for this tile: {exc}")
 
         osm_water_union = water_future.result()
         nhd_union = nhd_future.result()
@@ -145,6 +152,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
                 "imperviousPct": int(impervious) if impervious not in (None,) and impervious <= 100 else None,
                 "distanceToWaterM": round(dist_water_m, 1) if dist_water_m is not None else None,
                 "femaSfha": in_sfha,
+                "hydrologicSoilGroup": hydrologic_soil_group,
             })
 
     elevs = [c["elevationM"] for c in raw_cells if c["elevationM"] is not None]

@@ -175,5 +175,25 @@
       "Same satellite-observation-quality caveats as the pilot pull: cloud/vegetation-obscured cells excluded via clear_perc, permanent water excluded via jrc_perm_water."
     ],
     "isSynthetic": false
+  },
+  {
+    "id": "usda-soil-data-access-hydrologic-soil-group-live",
+    "title": "USDA NRCS hydrologic soil group (SSURGO, via Soil Data Access), live per-tile",
+    "provider": "USDA Natural Resources Conservation Service, Soil Data Access (SDA)",
+    "sourceUrl": "https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest",
+    "retrievedAt": "live, per tile request (see services/risk/adapters/soil.py)",
+    "dataDate": "current SSURGO/gSSURGO certified soil survey data as served by SDA",
+    "coverage": "Statewide New York, resolved at each tile's real centroid point (soil mapunit polygons are coarser than the ~100 m analysis grid, so one real point sample is applied tile-wide)",
+    "resolution": "Mapunit polygon (variable, typically much larger than 100 m); one representative point per tile",
+    "license": "U.S. Government work, public domain",
+    "usedFor": [
+      "soilInfiltration (baseline-weights-v0.5.0)"
+    ],
+    "limitations": [
+      "Tile-centroid sampling, not per-cell -- a documented simplification, not per-cell soil variation.",
+      "Dense urban/built-up mapunits are often unclassified in SSURGO; real gap surfaced as a missing factor (lower confidence), never fabricated.",
+      "Dual drained/undrained classes (e.g. A/D) resolved to the conservative (undrained) letter since actual drainage status is unknown."
+    ],
+    "isSynthetic": false
   }
 ]
