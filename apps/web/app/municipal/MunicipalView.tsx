@@ -1,9 +1,10 @@
 "use client";
 
 import { computeBaselineRisk } from "@flood-ai/risk-runtime";
-import { RAINFALL_SCENARIOS, type RiskCategory, type RiskResult } from "@flood-ai/shared";
-import { useState } from "react";
+import { RAINFALL_SCENARIOS, type RiskCategory, type RiskFeatures, type RiskResult } from "@flood-ai/shared";
+import { useMemo, useState } from "react";
 import { riskColor } from "@/lib/colorRamp";
+import { suggestBestIntervention } from "@/lib/interventionTypes";
 import { DATA_VERSION, FEATURE_TILE_ZOOM, rawCellToFeatures, type TileResponse } from "@/lib/riskTile";
 import { tilesForBounds, type TileId } from "@/lib/tileMath";
 
@@ -28,6 +29,7 @@ interface GeocodeResult {
 interface CellResult extends RiskResult {
   lat: number;
   lon: number;
+  feature: RiskFeatures;
 }
 
 async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
@@ -103,7 +105,7 @@ export default function MunicipalView() {
               rainfallScenarioId: scenario.id,
               dataVersion: DATA_VERSION,
             });
-            return { ...result, lat: c.centroid[1], lon: c.centroid[0] };
+            return { ...result, lat: c.centroid[1], lon: c.centroid[0], feature };
           });
         } catch {
           setProgress((p) => ({ ...p, done: p.done + 1 }));
@@ -137,6 +139,22 @@ export default function MunicipalView() {
     count: cells.filter((c) => c.riskCategory === cat).length,
   }));
   const topCells = [...cells].sort((a, b) => b.riskScore - a.riskScore).slice(0, 10);
+  const scenario = RAINFALL_SCENARIOS.find((s) => s.id === rainfallScenarioId) ?? RAINFALL_SCENARIOS[0];
+  const suggestions = useMemo(
+    () =>
+      new Map(
+        topCells.map((c) => [
+          c.cellId,
+          suggestBestIntervention(c.feature, {
+            rainfallTotalInches: scenario.totalInches,
+            rainfallScenarioId: scenario.id,
+            dataVersion: DATA_VERSION,
+          }),
+        ]),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cells, rainfallScenarioId],
+  );
 
   return (
     <div className="mt-8">
@@ -259,26 +277,46 @@ export default function MunicipalView() {
                   <th className="px-3 py-2 font-normal">Category</th>
                   <th className="px-3 py-2 font-normal">Confidence</th>
                   <th className="px-3 py-2 font-normal">Coordinates</th>
+                  <th className="px-3 py-2 font-normal">Suggested intervention</th>
                 </tr>
               </thead>
               <tbody>
-                {topCells.map((c, i) => (
-                  <tr key={c.cellId} className="border-b border-border last:border-0">
-                    <td className="px-3 py-2 text-ink-muted">{i + 1}</td>
-                    <td className="px-3 py-2 font-mono tabular" style={{ color: riskColor(c.riskScore) }}>
-                      {c.riskScore}
-                    </td>
-                    <td className="px-3 py-2 capitalize text-ink-muted">{c.riskCategory.replace("_", " ")}</td>
-                    <td className="px-3 py-2 font-mono tabular text-ink-muted">{c.confidenceScore}%</td>
-                    <td className="px-3 py-2 font-mono tabular text-ink-muted">
-                      {c.lat.toFixed(4)}, {c.lon.toFixed(4)}
-                    </td>
-                  </tr>
-                ))}
+                {topCells.map((c, i) => {
+                  const suggestion = suggestions.get(c.cellId);
+                  return (
+                    <tr key={c.cellId} className="border-b border-border last:border-0">
+                      <td className="px-3 py-2 text-ink-muted">{i + 1}</td>
+                      <td className="px-3 py-2 font-mono tabular" style={{ color: riskColor(c.riskScore) }}>
+                        {c.riskScore}
+                      </td>
+                      <td className="px-3 py-2 capitalize text-ink-muted">{c.riskCategory.replace("_", " ")}</td>
+                      <td className="px-3 py-2 font-mono tabular text-ink-muted">{c.confidenceScore}%</td>
+                      <td className="px-3 py-2 font-mono tabular text-ink-muted">
+                        {c.lat.toFixed(4)}, {c.lon.toFixed(4)}
+                      </td>
+                      <td className="px-3 py-2 text-ink-muted">
+                        {suggestion ? (
+                          <>
+                            {suggestion.label}{" "}
+                            <span className="font-mono tabular text-accent">
+                              ({suggestion.beforeScore}→{suggestion.afterScore})
+                            </span>
+                          </>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-[11px] text-ink-muted">Top 10 of {cells.length} scored cells, by risk score.</p>
+          <p className="mt-2 text-[11px] text-ink-muted">
+            Top 10 of {cells.length} scored cells, by risk score. Suggested intervention is whichever real
+            intervention type this same engine scores as reducing risk most at that spot — a starting point, not
+            an engineering recommendation.
+          </p>
         </div>
       )}
 

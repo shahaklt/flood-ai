@@ -12,6 +12,7 @@ import { Map as MapLibreMap, setWorkerUrl, type GeoJSONSource, type MapMouseEven
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { riskColor, UNSUPPORTED_COLOR } from "@/lib/colorRamp";
+import { INTERVENTION_TYPES } from "@/lib/interventionTypes";
 import { tileKey, tilesForBounds } from "@/lib/tileMath";
 import type { RiskWorkerRequest, RiskWorkerResponse } from "../map/riskWorker";
 
@@ -24,14 +25,6 @@ const GRID_SOURCE_ID = "sim-risk-grid";
 const GRID_FILL_LAYER_ID = "sim-risk-grid-fill";
 const POINT_SOURCE_ID = "sim-intervention-point";
 const POINT_LAYER_ID = "sim-intervention-point-circle";
-
-const INTERVENTION_TYPES: { value: InterventionType; label: string; defaultRadius: number; defaultStrength: number }[] = [
-  { value: "proposed_drain", label: "Proposed drain / catch basin", defaultRadius: 80, defaultStrength: 0.6 },
-  { value: "drain_repair", label: "Drain repair / capacity restoration", defaultRadius: 80, defaultStrength: 0.5 },
-  { value: "flood_barrier", label: "Flood barrier / berm", defaultRadius: 60, defaultStrength: 0.8 },
-  { value: "road_repair", label: "Road / intersection regrading", defaultRadius: 50, defaultStrength: 0.4 },
-  { value: "permeable_surface", label: "Permeable surface conversion", defaultRadius: 40, defaultStrength: 0.5 },
-];
 
 type CellFeature = GeoJSON.Feature<GeoJSON.Polygon, RiskFeatures>;
 interface RawTileCell extends RiskFeatures {
