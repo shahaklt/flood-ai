@@ -35,12 +35,19 @@ export async function GET(request: Request) {
       lat: string;
       lon: string;
       importance: number;
+      boundingbox: [string, string, string, string]; // [south, north, west, east]
     }>;
     return NextResponse.json({
       results: results.map((r) => ({
         label: r.display_name,
         lat: parseFloat(r.lat),
         lon: parseFloat(r.lon),
+        boundingBox: {
+          south: parseFloat(r.boundingbox[0]),
+          north: parseFloat(r.boundingbox[1]),
+          west: parseFloat(r.boundingbox[2]),
+          east: parseFloat(r.boundingbox[3]),
+        },
       })),
     });
   } catch {

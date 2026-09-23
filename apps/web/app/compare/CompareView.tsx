@@ -4,33 +4,10 @@ import { computeBaselineRisk } from "@flood-ai/risk-runtime";
 import { RAINFALL_SCENARIOS, type RiskFeatures, type RiskResult } from "@flood-ai/shared";
 import { useState } from "react";
 import { riskColor } from "@/lib/colorRamp";
+import { DATA_VERSION, FEATURE_TILE_ZOOM, rawCellToFeatures, type RawTileCell, type TileResponse } from "@/lib/riskTile";
 import { lonLatToTile } from "@/lib/tileMath";
 
-const DATA_VERSION = "risk-tiles-v1-nystate";
-const FEATURE_TILE_ZOOM = 13;
 const MAX_LOCATIONS = 4;
-
-interface RawTileCell {
-  cellId: string;
-  centroid: [number, number];
-  elevationM: number | null;
-  slopeDegrees: number | null;
-  flowAccumulation: number | null;
-  topographicWetnessIndex: number | null;
-  curvature: number | null;
-  landCoverClass: number | null;
-  imperviousPct: number | null;
-  distanceToWaterM: number | null;
-  femaSfha: boolean;
-  relativeElevationZ: number | null;
-  coverageTier: RiskFeatures["coverageTier"];
-}
-
-interface TileResponse {
-  coverageTier: RiskFeatures["coverageTier"];
-  features: RawTileCell[];
-  error?: string;
-}
 
 interface GeocodeResult {
   label: string;
@@ -149,22 +126,7 @@ export default function CompareView() {
         updateSlot(id, { status: "error", errorMessage: "No analysis cell found near this location." });
         return;
       }
-      const feature: RiskFeatures = {
-        cellId: cell.cellId,
-        centroid: cell.centroid,
-        coverageTier: cell.coverageTier,
-        elevationM: cell.elevationM,
-        slopeDegrees: cell.slopeDegrees,
-        flowAccumulation: cell.flowAccumulation,
-        topographicWetnessIndex: cell.topographicWetnessIndex,
-        curvature: cell.curvature,
-        landCoverClass: cell.landCoverClass,
-        imperviousPct: cell.imperviousPct,
-        distanceToWaterM: cell.distanceToWaterM,
-        distanceToRoadM: null,
-        femaSfha: cell.femaSfha,
-        relativeElevationZ: cell.relativeElevationZ,
-      };
+      const feature = rawCellToFeatures(cell);
       updateSlot(id, { status: "done", feature, result: recompute(feature) });
     } catch {
       updateSlot(id, { status: "error", errorMessage: "Risk lookup failed." });
