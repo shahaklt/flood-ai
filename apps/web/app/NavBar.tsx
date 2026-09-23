@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/map", label: "Map" },
   { href: "/simulate", label: "Simulate" },
   { href: "/compare", label: "Compare" },
+  { href: "/reports", label: "Reports" },
   { href: "/impact", label: "Impact" },
   { href: "/methodology", label: "Methodology" },
 ];
