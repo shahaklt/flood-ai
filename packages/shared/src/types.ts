@@ -24,6 +24,7 @@ export interface RiskFeatures {
   slopeDegrees: number | null;
   flowAccumulation: number | null;
   topographicWetnessIndex: number | null;
+  curvature: number | null;
   landCoverClass: number | null;
   imperviousPct: number | null;
   distanceToWaterM: number | null;

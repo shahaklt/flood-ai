@@ -3,6 +3,15 @@
  * through code, so it can be reviewed, sensitivity-tested, and cited in
  * docs/METHODOLOGY.md.
  *
+ * v0.4.0 rationale:
+ * - Added curvature (discrete Laplacian of elevation): concave terrain
+ *   (a local bowl) collects water even without much upslope contributing
+ *   area, which flowAccumulation/TWI alone don't capture -- a real,
+ *   independent geomorphometry signal, free to compute from the DEM
+ *   already fetched. Confirmed via a real hyperparameter search
+ *   (scripts/training/train_statewide_lightgbm.py) that additional
+ *   real terrain features meaningfully move balanced accuracy.
+ *
  * v0.3.0 rationale:
  * - Added topographicWetnessIndex = ln(flowAccumulation / tan(slope)), the
  *   standard hydrology combination of the two -- high where water both
@@ -25,16 +34,17 @@
  *   v0.1.0 and raises the confidence ceiling accordingly (see
  *   risk-runtime/baseline.ts AVAILABLE_CONCEPTUAL_FACTOR_COUNT).
  */
-export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.3.0";
+export const BASELINE_WEIGHTS_VERSION = "baseline-weights-v0.4.0";
 
 export const BASELINE_WEIGHTS = {
-  lowElevation: 0.18,
-  lowSlope: 0.08,
-  flowAccumulation: 0.14,
-  topographicWetnessIndex: 0.12,
-  waterProximity: 0.18,
-  femaZone: 0.16,
-  impervious: 0.14,
+  lowElevation: 0.16,
+  lowSlope: 0.07,
+  flowAccumulation: 0.13,
+  topographicWetnessIndex: 0.11,
+  curvature: 0.08,
+  waterProximity: 0.17,
+  femaZone: 0.15,
+  impervious: 0.13,
 } as const;
 
 export type BaselineFactorKey = keyof typeof BASELINE_WEIGHTS;

@@ -26,7 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TABLE_PATH = REPO_ROOT / "data" / "demo" / "statewide_training_table.csv"
 EVAL_OUT_PATH = REPO_ROOT / "data" / "models" / "statewide_eval.json"
 
-FEATURE_COLS = ["elevationM", "slopeDegrees", "flowAccumulation", "relativeElevationZ", "landCoverClass", "imperviousPct"]
+FEATURE_COLS = ["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex", "curvature", "relativeElevationZ", "landCoverClass", "imperviousPct"]
 BOOL_COLS = ["femaSfha"]
 N_SPLITS = 5
 

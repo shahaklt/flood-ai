@@ -1,7 +1,7 @@
 {
   "modelId": "experimental-logreg-v0.1.0",
   "status": "EXPERIMENTAL \u2014 not used for production predictions",
-  "generatedAt": "2026-09-22T21:24:30.471747+00:00",
+  "generatedAt": "2026-09-23T01:16:32.148484+00:00",
   "trainingRows": 3591,
   "positiveRows": 38,
   "positiveRate": 0.010582010582010581,
@@ -15,6 +15,7 @@
     "slopeDegrees",
     "flowAccumulation",
     "topographicWetnessIndex",
+    "curvature",
     "landCoverClass",
     "imperviousPct",
     "distanceToWaterM",
@@ -23,16 +24,17 @@
     "femaSfha"
   ],
   "inSampleCoefficients": {
-    "elevationM": -2.528112344675737,
-    "slopeDegrees": -0.5278640366951769,
-    "flowAccumulation": 0.26569494155474865,
-    "topographicWetnessIndex": -1.5634140701515569,
-    "landCoverClass": -0.2060973485936438,
-    "imperviousPct": -0.5146593694217687,
-    "distanceToWaterM": -4.0472156383976685,
-    "distanceToRoadM": 0.14473700106802587,
-    "relativeElevationZ": -2.5252322252404933,
-    "femaSfha": 0.8619178217630463
+    "elevationM": -2.581447572475231,
+    "slopeDegrees": -0.42984814464809057,
+    "flowAccumulation": 0.23761145055696217,
+    "topographicWetnessIndex": -1.4226313307687608,
+    "curvature": -0.21780929777578545,
+    "landCoverClass": -0.19119315964838635,
+    "imperviousPct": -0.5642278223215692,
+    "distanceToWaterM": -4.065497478833951,
+    "distanceToRoadM": 0.10884226848185624,
+    "relativeElevationZ": -2.5789207935923013,
+    "femaSfha": 0.8528975144000652
   },
   "leaveOneEventOutFolds": [
     {
@@ -40,24 +42,24 @@
       "heldOutEvent": "DFO_3625_From_20100310_to_20100324",
       "testRows": 1197,
       "testPositives": 22,
-      "brierScore": 0.05396847937291619,
-      "rocAuc": 0.8771760154738878
+      "brierScore": 0.0493853067942746,
+      "rocAuc": 0.8569052224371374
     },
     {
       "fold": 1,
       "heldOutEvent": "DFO_3629_From_20100327_to_20100331",
       "testRows": 1197,
       "testPositives": 10,
-      "brierScore": 0.0944713213240056,
-      "rocAuc": 0.9678180286436394
+      "brierScore": 0.09478129564921217,
+      "rocAuc": 0.9689132266217354
     },
     {
       "fold": 2,
       "heldOutEvent": "DFO_3861_From_20110827_to_20110913",
       "testRows": 1197,
       "testPositives": 6,
-      "brierScore": 0.09336351018575037,
-      "rocAuc": 0.9547998880492583
+      "brierScore": 0.09372667801758428,
+      "rocAuc": 0.9546599496221662
     }
   ],
   "limitations": [

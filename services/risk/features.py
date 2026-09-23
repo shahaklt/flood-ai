@@ -12,7 +12,7 @@ from shapely.geometry import Point, box
 from shapely.ops import unary_union
 
 from .adapters import coverage, dem, fema, nhd, nlcd, osm_water
-from .hydrology import compute_flow_accumulation
+from .hydrology import compute_curvature, compute_flow_accumulation
 from .tiles import tile_to_bbox
 
 CELL_SIZE_DEG_LAT = 0.0009  # ~100 m
@@ -99,6 +99,9 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
     # water both concentrates AND has nowhere to drain. Free to compute from
     # data already fetched; epsilon avoids division by zero on flat cells.
     twi_arr = np.log((flow_acc_arr + 1.0) / (np.tan(np.radians(slope_arr)) + 0.01))
+    pixel_size_x_m = pixel_w_deg * m_per_deg_lon
+    pixel_size_y_m = pixel_h_deg * m_per_deg_lat
+    curvature_arr = compute_curvature(dem_arr, pixel_size_x_m, pixel_size_y_m)
 
     n_cols = max(1, round((xmax - xmin) / (CELL_SIZE_DEG_LAT * m_per_deg_lat / m_per_deg_lon)))
     n_rows = max(1, round((ymax - ymin) / CELL_SIZE_DEG_LAT))
@@ -116,6 +119,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
             slope = _sample(dem_transform, slope_arr, centroid_lon, centroid_lat)
             flow_acc = _sample(dem_transform, flow_acc_arr, centroid_lon, centroid_lat)
             twi = _sample(dem_transform, twi_arr, centroid_lon, centroid_lat)
+            curvature = _sample(dem_transform, curvature_arr, centroid_lon, centroid_lat)
             land_cover = _sample(lc_transform, lc_arr, centroid_lon, centroid_lat) if lc_arr is not None else None
             impervious = _sample(imp_transform, imp_arr, centroid_lon, centroid_lat) if imp_arr is not None else None
 
@@ -136,6 +140,7 @@ def compute_tile_features(z: int, x: int, y: int) -> dict:
                 "slopeDegrees": slope,
                 "flowAccumulation": flow_acc,
                 "topographicWetnessIndex": twi,
+                "curvature": curvature,
                 "landCoverClass": int(land_cover) if land_cover is not None else None,
                 "imperviousPct": int(impervious) if impervious not in (None,) and impervious <= 100 else None,
                 "distanceToWaterM": round(dist_water_m, 1) if dist_water_m is not None else None,

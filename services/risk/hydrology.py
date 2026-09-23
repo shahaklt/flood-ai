@@ -45,3 +45,14 @@ def compute_flow_accumulation(dem: np.ndarray) -> np.ndarray:
             accumulation[tr, tc] += accumulation[r, c]
 
     return accumulation
+
+
+def compute_curvature(dem: np.ndarray, pixel_size_x_m: float, pixel_size_y_m: float) -> np.ndarray:
+    """Real terrain curvature (discrete Laplacian of elevation): positive
+    where terrain is concave (a bowl -- water converges and collects),
+    negative where convex (a ridge -- water sheds away). Standard real
+    geomorphometry technique, computed free from the DEM already fetched."""
+    gy, gx = np.gradient(dem, pixel_size_y_m, pixel_size_x_m)
+    gyy, _ = np.gradient(gy, pixel_size_y_m, pixel_size_x_m)
+    _, gxx = np.gradient(gx, pixel_size_y_m, pixel_size_x_m)
+    return gxx + gyy

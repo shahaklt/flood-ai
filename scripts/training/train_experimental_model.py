@@ -24,7 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 TABLE_PATH = REPO_ROOT / "data" / "demo" / "event_cell_training_table.csv"
 EVAL_OUT_PATH = REPO_ROOT / "data" / "models" / "experimental_logreg_eval.json"
 
-FEATURE_COLS = ["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex",
+FEATURE_COLS = ["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex", "curvature",
                  "landCoverClass", "imperviousPct", "distanceToWaterM", "distanceToRoadM", "relativeElevationZ"]
 # femaSfha is boolean; handled separately since it's not continuous
 BOOL_COLS = ["femaSfha"]

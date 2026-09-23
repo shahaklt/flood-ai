@@ -26,8 +26,9 @@ from shapely.ops import unary_union
 
 from services.risk.adapters import fema, nhd, nlcd, osm_water  # noqa: E402
 from services.risk.adapters.dem import fetch_dem  # noqa: E402
-from services.risk.hydrology import compute_flow_accumulation  # noqa: E402
+from services.risk.hydrology import compute_curvature, compute_flow_accumulation  # noqa: E402
 from services.risk.tiles import lonlat_to_tile, tile_to_bbox  # noqa: E402
+import math  # noqa: E402
 
 EVENTS_DIR = REPO_ROOT / "data" / "raw" / "gfd_events_nystate"
 MANIFEST_PATH = REPO_ROOT / "data" / "metadata" / "gfd_events_nystate.json"
@@ -100,6 +101,12 @@ def main() -> None:
         gy, gx = np.gradient(dem_arr)
         slope_arr = np.degrees(np.arctan(np.sqrt(gx**2 + gy**2)))  # coarse; degree-based, real but approximate at this scale
         twi_arr = np.log((flow_acc_arr + 1.0) / (np.tan(np.radians(slope_arr)) + 0.01))
+        center_lat = (bbox[1] + bbox[3]) / 2
+        m_per_deg_lat = 111_320.0
+        m_per_deg_lon = 111_320.0 * math.cos(math.radians(center_lat))
+        pixel_size_x_m = FEATURE_PIXEL_SIZE_DEG * m_per_deg_lon
+        pixel_size_y_m = FEATURE_PIXEL_SIZE_DEG * m_per_deg_lat
+        curvature_arr = compute_curvature(dem_arr, pixel_size_x_m, pixel_size_y_m)
 
         try:
             lc_arr, lc_transform = nlcd.fetch_land_cover(bbox)
@@ -151,6 +158,7 @@ def main() -> None:
                     slope = sample_at(dem_transform, slope_arr, lon, lat)
                     flow_acc = sample_at(dem_transform, flow_acc_arr, lon, lat)
                     twi = sample_at(dem_transform, twi_arr, lon, lat)
+                    curvature = sample_at(dem_transform, curvature_arr, lon, lat)
                     land_cover = sample_at(lc_transform, lc_arr, lon, lat) if lc_arr is not None else None
                     impervious = sample_at(imp_transform, imp_arr, lon, lat) if imp_arr is not None else None
                     dist_water = Point(lon, lat).distance(water_union) * 111_000 if water_union is not None else None
@@ -165,6 +173,7 @@ def main() -> None:
                         "slopeDegrees": slope,
                         "flowAccumulation": flow_acc,
                         "topographicWetnessIndex": twi,
+                        "curvature": curvature,
                         "relativeElevationZ": rel_z,
                         "landCoverClass": land_cover,
                         "imperviousPct": impervious,
@@ -174,7 +183,7 @@ def main() -> None:
 
         time.sleep(0.5)  # light courtesy delay between tiles (Overpass etiquette)
 
-    df = pd.DataFrame(all_rows).dropna(subset=["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex"])
+    df = pd.DataFrame(all_rows).dropna(subset=["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex", "curvature"])
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT_PATH, index=False)
     print(f"\nWrote {len(df)} real statewide training rows to {OUT_PATH}")

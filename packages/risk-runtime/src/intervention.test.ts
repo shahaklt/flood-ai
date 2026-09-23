@@ -10,6 +10,7 @@ const cell = (overrides: Partial<RiskFeatures> = {}): RiskFeatures => ({
   slopeDegrees: 1,
   flowAccumulation: 40,
   topographicWetnessIndex: 5,
+  curvature: 0.001,
   landCoverClass: 22,
   imperviousPct: 70,
   distanceToWaterM: 20,

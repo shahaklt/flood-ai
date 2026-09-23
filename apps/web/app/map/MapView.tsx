@@ -44,6 +44,7 @@ interface RawTileCell {
   slopeDegrees: number | null;
   flowAccumulation: number | null;
   topographicWetnessIndex: number | null;
+  curvature: number | null;
   landCoverClass: number | null;
   imperviousPct: number | null;
   distanceToWaterM: number | null;
@@ -124,6 +125,7 @@ export default function MapView() {
                     slopeDegrees: c.slopeDegrees,
                     flowAccumulation: c.flowAccumulation,
                     topographicWetnessIndex: c.topographicWetnessIndex,
+                    curvature: c.curvature,
                     landCoverClass: c.landCoverClass,
                     imperviousPct: c.imperviousPct,
                     distanceToWaterM: c.distanceToWaterM,

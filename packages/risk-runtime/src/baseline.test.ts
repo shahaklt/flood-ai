@@ -10,6 +10,7 @@ const baseFeatures: RiskFeatures = {
   slopeDegrees: 2,
   flowAccumulation: 12,
   topographicWetnessIndex: 5,
+  curvature: 0.001,
   landCoverClass: 22,
   imperviousPct: 40,
   distanceToWaterM: 50,
@@ -62,6 +63,12 @@ describe("computeBaselineRisk", () => {
     const low = computeBaselineRisk({ ...baseFeatures, flowAccumulation: 1 }, opts);
     const high = computeBaselineRisk({ ...baseFeatures, flowAccumulation: 200 }, opts);
     expect(high.riskScore).toBeGreaterThanOrEqual(low.riskScore);
+  });
+
+  it("more concave terrain (higher curvature) cannot decrease risk score", () => {
+    const convex = computeBaselineRisk({ ...baseFeatures, curvature: -0.005 }, opts);
+    const concave = computeBaselineRisk({ ...baseFeatures, curvature: 0.005 }, opts);
+    expect(concave.riskScore).toBeGreaterThanOrEqual(convex.riskScore);
   });
 
   it("reduces confidence rather than fabricating a score when a factor is missing", () => {

@@ -15,7 +15,7 @@ import {
  * compute from real data (no wired-up hydrologic-soil-group source).
  * Counted against confidence, never faked. */
 const STRUCTURALLY_MISSING_FACTORS = ["soilInfiltration"] as const;
-const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 7; // elevation, slope, flowAccumulation, TWI, water, fema, impervious
+const AVAILABLE_CONCEPTUAL_FACTOR_COUNT = 8; // elevation, slope, flowAccumulation, TWI, curvature, water, fema, impervious
 const TOTAL_CONCEPTUAL_FACTOR_COUNT =
   AVAILABLE_CONCEPTUAL_FACTOR_COUNT + STRUCTURALLY_MISSING_FACTORS.length;
 
@@ -31,6 +31,13 @@ const FLOW_ACCUMULATION_LOG_REFERENCE = Math.log1p(50);
  * across that documented range rather than an arbitrary scale. */
 const TWI_MIN = 2;
 const TWI_MAX = 10;
+
+/** Real curvature (elevation Laplacian) at this grid's ~100m spacing
+ * typically spans roughly [-0.005, 0.005] in hilly real terrain (measured
+ * directly from fetched tiles); linearly mapped so 0 (flat/planar) sits at
+ * the factor midpoint, positive (concave, water-collecting) pushes toward
+ * 1, negative (convex, water-shedding) toward 0. */
+const CURVATURE_REFERENCE = 0.005;
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
@@ -60,6 +67,11 @@ function flowAccumulationFactor(count: number | null): number | null {
 function twiFactor(twi: number | null): number | null {
   if (twi == null) return null;
   return clamp01((twi - TWI_MIN) / (TWI_MAX - TWI_MIN));
+}
+
+function curvatureFactor(curvature: number | null): number | null {
+  if (curvature == null) return null;
+  return clamp01(0.5 + curvature / (2 * CURVATURE_REFERENCE));
 }
 
 function waterProximityFactor(distM: number | null): number | null {
@@ -126,6 +138,7 @@ export function computeBaselineRisk(features: RiskFeatures, options: BaselineOpt
       const f = twiFactor(features.topographicWetnessIndex);
       return f === null ? null : clamp01(f * (1 + amplification));
     })(),
+    curvature: curvatureFactor(features.curvature),
     waterProximity: (() => {
       const f = waterProximityFactor(features.distanceToWaterM);
       return f === null ? null : clamp01(f * (1 + amplification));
@@ -205,6 +218,12 @@ function factorLabel(key: BaselineFactorKey, features: RiskFeatures): string {
       return features.topographicWetnessIndex != null
         ? `High topographic wetness index (${features.topographicWetnessIndex.toFixed(1)})`
         : "Topographic wetness index";
+    case "curvature":
+      return features.curvature != null
+        ? features.curvature > 0
+          ? `Concave terrain — water tends to collect here (curvature ${features.curvature.toFixed(4)})`
+          : `Convex terrain — water tends to shed away (curvature ${features.curvature.toFixed(4)})`
+        : "Terrain curvature";
     case "waterProximity":
       return features.distanceToWaterM != null
         ? `Near mapped surface water (${Math.round(features.distanceToWaterM)} m)`
@@ -230,6 +249,8 @@ function rawValueFor(key: BaselineFactorKey, features: RiskFeatures): number | s
       return features.flowAccumulation;
     case "topographicWetnessIndex":
       return features.topographicWetnessIndex;
+    case "curvature":
+      return features.curvature;
     case "waterProximity":
       return features.distanceToWaterM;
     case "femaZone":

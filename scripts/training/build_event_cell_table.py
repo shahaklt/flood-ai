@@ -63,7 +63,7 @@ def main() -> None:
     print(f"Loaded {len(cells)} real, in-AOI feature-grid cells.")
     events = {e["eventId"]: e for e in json.loads(EVENTS_MANIFEST_PATH.read_text())}
 
-    feature_cols = ["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex",
+    feature_cols = ["elevationM", "slopeDegrees", "flowAccumulation", "topographicWetnessIndex", "curvature",
                      "landCoverClass", "imperviousPct", "distanceToWaterM", "distanceToRoadM",
                      "femaSfha", "relativeElevationZ"]
     cell_features = {c["cellId"]: {k: c[k] for k in feature_cols} for c in cells}

@@ -124,6 +124,9 @@ def main() -> None:
     flow_acc_arr = compute_flow_accumulation(dem_arr)
     twi_arr = np.log((flow_acc_arr + 1.0) / (np.tan(np.radians(slope_arr)) + 0.01))
 
+    from services.risk.hydrology import compute_curvature
+    curvature_arr = compute_curvature(dem_arr, pixel_size_m, pixel_size_m)
+
     print("Loading NLCD land cover + impervious (kept in native CRS, sampled via lon/lat)...")
     lc_ds = rasterio.open(RAW_DIR / "nlcd_land_cover.tif")
     imp_ds = rasterio.open(RAW_DIR / "nlcd_impervious.tif")
@@ -184,6 +187,7 @@ def main() -> None:
         slope = sample_at(dem_transform, slope_arr, centroid_proj.x, centroid_proj.y)
         flow_acc = sample_at(dem_transform, flow_acc_arr, centroid_proj.x, centroid_proj.y)
         twi = sample_at(dem_transform, twi_arr, centroid_proj.x, centroid_proj.y)
+        curvature = sample_at(dem_transform, curvature_arr, centroid_proj.x, centroid_proj.y)
 
         lc_row, lc_col = lc_ds.index(centroid_wgs84.x, centroid_wgs84.y)
         land_cover = None
@@ -212,6 +216,7 @@ def main() -> None:
             "slopeDegrees": slope,
             "flowAccumulation": flow_acc,
             "topographicWetnessIndex": twi,
+            "curvature": curvature,
             "landCoverClass": land_cover,
             "imperviousPct": impervious_pct,
             "distanceToWaterM": dist_water,
